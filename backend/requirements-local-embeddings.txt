@@ -1,0 +1,3 @@
+# Optional: free local embeddings (large download: torch + model weights).
+# Install only if EMBEDDING_PROVIDER=local, and set EMBEDDING_DIM=1024.
+sentence-transformers>=3.0
