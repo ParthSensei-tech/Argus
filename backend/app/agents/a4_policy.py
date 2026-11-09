@@ -24,26 +24,44 @@ Rules:
 - Flag rules that are unclear or conflicting as AMBIGUOUS with human_action_required=true."""
 
 
+def _extract_prohibited_terms(item) -> list[str]:
+    terms = []
+    if item.structured.get("term"):
+        terms.append(str(item.structured["term"]))
+    if isinstance(item.structured.get("prohibited_terms"), list):
+        terms.extend(str(t) for t in item.structured["prohibited_terms"] if t)
+    # Also look for quoted terms in body and title like 'term' or "term"
+    quoted = re.findall(r"['\"]([^'\"]{2,50})['\"]", f"{item.title} {item.body}")
+    terms.extend(quoted)
+    if not terms and len(item.title.strip()) <= 40:
+        terms.append(item.title.strip())
+    # Deduplicate while preserving order
+    seen = set()
+    return [t.strip() for t in terms if t.strip() and not (t.lower() in seen or seen.add(t.lower()))]
+
+
 def _deterministic_checks(canonical: CanonicalContent, knowledge: RetrievedKnowledge, channel: str) -> list[AgentFinding]:
     findings: list[AgentFinding] = []
     text = canonical.full_text
     for item in knowledge.items:
-        term = item.structured.get("term") or item.title
         if item.type == "PROHIBITED_TERM":
-            for match in re.finditer(rf"\b{re.escape(term)}\b", text, re.IGNORECASE):
-                findings.append(AgentFinding(
-                    category=FindingCategory.TONE_TERMINOLOGY,
-                    severity=Severity.MAJOR,
-                    status=FindingStatus.VIOLATION,
-                    confidence=1.0,
-                    original_text=match.group(0),
-                    explanation=f"Prohibited term '{term}' is not allowed by brand terminology.",
-                    evidence=[EvidenceRef(knowledge_item_id=item.item_id, knowledge_version=item.version,
-                                          excerpt=item.body, relation="CONTRADICTS")],
-                    policy_reference={"item_id": item.item_id, "version": item.version},
-                    suggested_correction=item.structured.get("replacement"),
-                ))
+            candidate_terms = _extract_prohibited_terms(item)
+            for term in candidate_terms:
+                for match in re.finditer(rf"\b{re.escape(term)}\b", text, re.IGNORECASE):
+                    findings.append(AgentFinding(
+                        category=FindingCategory.TONE_TERMINOLOGY,
+                        severity=Severity.MAJOR,
+                        status=FindingStatus.VIOLATION,
+                        confidence=1.0,
+                        original_text=match.group(0),
+                        explanation=f"Prohibited term '{term}' is not allowed by approved brand terminology.",
+                        evidence=[EvidenceRef(knowledge_item_id=item.item_id, knowledge_version=item.version,
+                                              excerpt=item.body, relation="CONTRADICTS")],
+                        policy_reference={"item_id": item.item_id, "version": item.version},
+                        suggested_correction=item.structured.get("replacement"),
+                    ))
         elif item.type == "TERM" and item.structured.get("required"):
+            term = item.structured.get("term") or item.title
             channels = item.structured.get("channels") or []
             if (not channels or channel in channels) and not re.search(rf"\b{re.escape(term)}\b", text, re.IGNORECASE):
                 findings.append(AgentFinding(

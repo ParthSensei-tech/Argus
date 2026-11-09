@@ -23,6 +23,7 @@ out/
 data/
 *.db
 *.sqlite3
+*.log
 
 # OS / editor
 .DS_Store

@@ -37,13 +37,22 @@ def record(
         if _held.get(sid, 0) == 0:
             event.listen(db, "after_transaction_end", lambda s, t: _release(s), once=True)
         _held[sid] = _held.get(sid, 0) + 1
-    last = (
-        db.query(AuditEvent)
-        .filter(AuditEvent.org_id == org_id)
-        .order_by(AuditEvent.created_at.desc())
-        .first()
-    )
-    prev_hash = last.hash if last else ""
+    # Check pending unflushed events in session first
+    pending = [
+        obj for obj in db.new
+        if isinstance(obj, AuditEvent) and obj.org_id == org_id and getattr(obj, "hash", None)
+    ]
+    if pending:
+        prev_hash = pending[-1].hash
+    else:
+        last = (
+            db.query(AuditEvent)
+            .filter(AuditEvent.org_id == org_id)
+            .order_by(AuditEvent.created_at.desc())
+            .first()
+        )
+        prev_hash = last.hash if last else ""
+
     body = {
         "org_id": str(org_id),
         "actor_id": str(actor_id) if actor_id else None,
@@ -64,4 +73,5 @@ def record(
         hash=digest,
     )
     db.add(event_)
+    db.flush()
     return event_

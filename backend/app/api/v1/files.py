@@ -1,4 +1,5 @@
 import hashlib
+import os
 import uuid
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
@@ -22,6 +23,20 @@ ALLOWED_MIMES = {
 }
 
 
+EXTENSION_MIMES = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".webp": "image/webp",
+    ".pdf": "application/pdf",
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    ".txt": "text/plain",
+    ".md": "text/markdown",
+    ".markdown": "text/markdown",
+}
+
+
 @router.post("/upload", response_model=FileOut)
 async def upload_file(
     file: UploadFile = File(...),
@@ -32,7 +47,11 @@ async def upload_file(
     data = await file.read()
     mime = file.content_type or "application/octet-stream"
     if mime not in ALLOWED_MIMES:
-        raise HTTPException(status_code=415, detail=f"Unsupported file type: {mime}")
+        ext = os.path.splitext(file.filename or "")[1].lower()
+        if ext in EXTENSION_MIMES:
+            mime = EXTENSION_MIMES[ext]
+        else:
+            raise HTTPException(status_code=415, detail=f"Unsupported file type: {mime}")
     if purpose not in ("content", "knowledge", "asset"):
         raise HTTPException(status_code=400, detail="purpose must be content, knowledge or asset")
     try:

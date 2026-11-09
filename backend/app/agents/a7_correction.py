@@ -58,6 +58,16 @@ def run(db: Session, review: Review, canonical: CanonicalContent, adjudication: 
                 corrections.append(c)
             elif c.suggested_text.strip() and c.suggested_text != c.original_text and c.finding_key in valid_keys:
                 corrections.append(c)
+        if not corrections and needs_llm:
+            for f in needs_llm:
+                if f.original_text:
+                    corrections.append(CorrectionItem(
+                        original_text=f.original_text,
+                        suggested_text="",
+                        no_safe_correction=True,
+                        explanation="Requires human copywriter or legal counsel to rewrite; no automated safe replacement found without risking legal or brand accuracy.",
+                        finding_key=f.finding_key,
+                    ))
         model, tin, tout = result.model, result.tokens_in, result.tokens_out
     output = CorrectionOutput(
         corrections=corrections,

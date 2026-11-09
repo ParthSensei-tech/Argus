@@ -38,11 +38,16 @@ def verify_chain(ctx=Depends(require_roles(Role.ADMIN)), db: Session = Depends(g
     events = (
         db.query(AuditEvent)
         .filter(AuditEvent.org_id == ctx.org_id)
-        .order_by(AuditEvent.created_at.asc())
         .all()
     )
+    if not events:
+        return {"valid": True, "checked": 0}
+
+    by_prev = {e.prev_hash: e for e in events}
     prev = ""
-    for e in events:
+    checked = 0
+    while prev in by_prev:
+        e = by_prev[prev]
         body = {
             "org_id": str(e.org_id),
             "actor_id": str(e.actor_id) if e.actor_id else None,
@@ -52,7 +57,11 @@ def verify_chain(ctx=Depends(require_roles(Role.ADMIN)), db: Session = Depends(g
             "payload": e.payload or {},
         }
         expected = hashlib.sha256((prev + json.dumps(body, sort_keys=True, default=str)).encode()).hexdigest()
-        if e.prev_hash != prev or e.hash != expected:
-            return {"valid": False, "broken_at": str(e.id), "checked": len(events)}
+        if e.hash != expected:
+            return {"valid": False, "broken_at": str(e.id), "checked": checked}
         prev = e.hash
-    return {"valid": True, "checked": len(events)}
+        checked += 1
+
+    if checked != len(events):
+        return {"valid": False, "broken_at": "forked_or_disconnected_chain", "checked": checked}
+    return {"valid": True, "checked": checked}

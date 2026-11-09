@@ -273,14 +273,18 @@ def extract_content(
             raise StorageError("No file data provided")
         if input_type == "IMAGE":
             return _extract_image(file_data, mime, org_id, storage, filename)
-        if mime == "application/pdf":
+        fn_lower = filename.lower()
+        if mime == "application/pdf" or fn_lower.endswith(".pdf"):
             return _extract_pdf(file_data, org_id, storage)
-        if mime.endswith("wordprocessingml.document"):
+        if mime.endswith("wordprocessingml.document") or fn_lower.endswith(".docx"):
             return _extract_docx(file_data, org_id, storage)
-        if mime.endswith("presentationml.presentation"):
+        if mime.endswith("presentationml.presentation") or fn_lower.endswith(".pptx"):
             return _extract_pptx(file_data, org_id, storage)
-        if mime in ("text/plain", "text/markdown"):
-            text = file_data.decode("utf-8")
+        if mime in ("text/plain", "text/markdown", "text/x-markdown") or fn_lower.endswith((".txt", ".md", ".markdown")):
+            try:
+                text = file_data.decode("utf-8")
+            except UnicodeDecodeError:
+                text = file_data.decode("latin-1", errors="replace")
             result = CanonicalContent(
                 input_type="DOCUMENT",
                 blocks=_text_blocks(text),
