@@ -103,6 +103,13 @@ export async function login(email: string, password: string): Promise<TokenRespo
   });
 }
 
+export async function demoLogin(role: "admin" | "reviewer" | "editor" = "admin"): Promise<TokenResponse> {
+  return apiFetch<TokenResponse>("/api/v1/auth/demo-login", {
+    method: "POST",
+    body: JSON.stringify({ role }),
+  });
+}
+
 export async function register(
   email: string,
   password: string,

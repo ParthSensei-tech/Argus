@@ -45,7 +45,7 @@ export function TabsList({
   return (
     <div
       className={[
-        'inline-flex h-10 items-center justify-center rounded-lg bg-gray-100 p-1 text-gray-500',
+        'inline-flex h-10 items-center justify-center rounded-xl bg-purple-950/70 border border-purple-800/50 p-1 text-purple-300',
         className,
       ].join(' ')}
     >
@@ -73,10 +73,10 @@ export function TabsTrigger({
       type="button"
       onClick={() => ctx.setActiveTab(value)}
       className={[
-        'inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
+        'inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400',
         isActive
-          ? 'bg-white text-gray-900 shadow-sm'
-          : 'text-gray-600 hover:text-gray-900',
+          ? 'bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-purple-950 shadow-gold-sm font-bold'
+          : 'text-purple-300/70 hover:text-white hover:bg-purple-900/40',
         className,
       ].join(' ')}
     >

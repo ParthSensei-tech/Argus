@@ -47,25 +47,25 @@ export function Dialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/75 backdrop-blur-md transition-opacity"
         onClick={onClose}
       />
 
       {/* Modal Dialog Content */}
       <div
         className={[
-          'relative w-full rounded-xl bg-white p-6 shadow-2xl transition-all',
+          'relative w-full rounded-2xl bg-[#160C2A] border border-amber-500/30 p-6 text-white shadow-2xl shadow-purple-950/80 transition-all',
           maxWidthClasses[maxWidth],
         ].join(' ')}
       >
         {/* Header */}
         {(title || description) && (
-          <div className="mb-4">
+          <div className="mb-4 pr-6">
             {title && (
-              <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+              <h3 className="text-lg font-bold text-white gold-gradient-text">{title}</h3>
             )}
             {description && (
-              <p className="mt-1 text-sm text-gray-500">{description}</p>
+              <p className="mt-1 text-xs text-purple-200/70">{description}</p>
             )}
           </div>
         )}
@@ -73,7 +73,7 @@ export function Dialog({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
+          className="absolute right-4 top-4 rounded-lg p-1.5 text-purple-400 hover:bg-purple-900/50 hover:text-amber-400 transition"
         >
           <span className="sr-only">Close</span>
           <svg

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import React from "react";
 import "./globals.css";
+import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
   title: {
@@ -35,7 +37,9 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="h-full">{children}</body>
+      <body className="h-full">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

@@ -15,6 +15,7 @@ import {
   getStoredOrgId,
   setStoredOrgId,
   login as apiLogin,
+  demoLogin as apiDemoLogin,
   register as apiRegister,
   me as apiMe,
   createOrg as apiCreateOrg,
@@ -38,6 +39,8 @@ interface AuthContextValue {
   loading: boolean;
   /** Log in with email + password. Stores token & fetches /me. */
   login: (email: string, password: string) => Promise<void>;
+  /** One-click demo login for admin, reviewer, or editor */
+  demoLogin: (role?: "admin" | "reviewer" | "editor") => Promise<void>;
   /** Log out. Clears token and resets state. */
   logout: () => void;
   /** Register a new user. Stores token & fetches /me. */
@@ -116,6 +119,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [hydrateUser]
   );
 
+  const demoLogin = useCallback(
+    async (role: "admin" | "reviewer" | "editor" = "admin") => {
+      const token = await apiDemoLogin(role);
+      setToken(token.access_token);
+      await hydrateUser();
+    },
+    [hydrateUser]
+  );
+
   const logout = useCallback(() => {
     clearToken();
     setUser(null);
@@ -162,6 +174,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setCurrentOrg,
       loading,
       login,
+      demoLogin,
       logout,
       register,
       createOrg,
@@ -174,6 +187,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setCurrentOrg,
       loading,
       login,
+      demoLogin,
       logout,
       register,
       createOrg,

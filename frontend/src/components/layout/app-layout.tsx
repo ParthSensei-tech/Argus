@@ -18,10 +18,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-[#090412]">
         <div className="text-center">
-          <LoadingSpinner size="lg" className="mb-4" />
-          <p className="text-sm font-medium text-gray-500">Loading Argus Governance...</p>
+          <LoadingSpinner size="lg" className="mb-4 text-amber-400" />
+          <p className="text-xs font-semibold text-amber-300/80">Loading Argus Governance...</p>
         </div>
       </div>
     );
@@ -32,10 +32,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#090412] text-[#F3EEFA]">
       <Sidebar />
       <div className="pl-64">
-        <main className="min-h-screen p-8">{children}</main>
+        <main className="min-h-screen p-8 max-w-7xl mx-auto">{children}</main>
       </div>
     </div>
   );

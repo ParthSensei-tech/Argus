@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth';
 import {
@@ -45,6 +47,8 @@ import {
   Tag,
   Palette,
   Search,
+  Crown,
+  Zap,
 } from 'lucide-react';
 
 export default function KnowledgePage() {
@@ -156,6 +160,21 @@ export default function KnowledgePage() {
     }
   };
 
+  const handleQuickAddJudgeRule = async (type: KnowledgeType, title: string, body: string) => {
+    try {
+      const item = await createItem({
+        type,
+        title,
+        body,
+        structured: { term: title },
+      });
+      await approveItem(item.id);
+      await loadAll();
+    } catch (err: any) {
+      alert(`Quick add failed: ${err.message}`);
+    }
+  };
+
   const handleCreateVersion = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!versionModal) return;
@@ -238,12 +257,17 @@ export default function KnowledgePage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-gray-200 pb-5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-purple-900/40 pb-5">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-            Brand Knowledge Management
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-extrabold tracking-tight gold-gradient-text">
+              Brand Knowledge Management
+            </h1>
+            <Badge variant="default">
+              <Crown className="h-3 w-3 mr-1" /> Provenance-Aware Engine
+            </Badge>
+          </div>
+          <p className="mt-1 text-xs text-purple-200/70">
             Approved facts, policies, prohibited terminology, and visual guidelines powering the 7-agent verification swarm.
           </p>
         </div>
@@ -259,10 +283,67 @@ export default function KnowledgePage() {
           </Button>
           <Button
             onClick={() => setCreateItemModal(true)}
-            className="gap-1.5 text-xs"
+            className="gap-1.5 text-xs font-bold shadow-gold-sm"
           >
             <Plus className="h-4 w-4" />
             Add Brand Rule / Fact
+          </Button>
+        </div>
+      </div>
+
+      {/* Judge Benchmark Rule Quick-Add Bar */}
+      <div className="p-3.5 rounded-2xl bg-gradient-to-r from-purple-950/80 via-[#150A2A] to-purple-950/50 border border-amber-500/30 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Zap className="h-4 w-4 text-amber-400 shrink-0" />
+          <div>
+            <span className="text-xs font-bold text-white">Judge Live Testing Presets:</span>
+            <span className="text-[11px] text-purple-300/70 ml-1.5">
+              1-Click create & approve novel benchmark rules into the live Knowledge Graph:
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              handleQuickAddJudgeRule(
+                'FACT',
+                'SOC 2 Type II Certification',
+                'Nexus Technologies holds active SOC 2 Type II compliance verified by Ernst & Young.'
+              )
+            }
+            className="text-[10px] h-7 px-2"
+          >
+            + Fact: SOC 2
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              handleQuickAddJudgeRule(
+                'PROHIBITED_TERM',
+                'foolproof',
+                'The term "foolproof" is prohibited in all external customer communications.'
+              )
+            }
+            className="text-[10px] h-7 px-2 text-amber-300 border-amber-500/40"
+          >
+            + Banned Term: &quot;foolproof&quot;
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              handleQuickAddJudgeRule(
+                'POLICY',
+                'Zero Downtime Claims',
+                'Communications must never guarantee 100% or zero downtime without approved engineering SLA addendum.'
+              )
+            }
+            className="text-[10px] h-7 px-2 text-amber-300 border-amber-500/40"
+          >
+            + Policy: Zero Downtime
           </Button>
         </div>
       </div>
@@ -291,39 +372,39 @@ export default function KnowledgePage() {
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
-                className="rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs shadow-xs focus:border-indigo-500 focus:outline-none"
+                className="rounded-lg border border-purple-800/60 bg-purple-950/60 px-2.5 py-1.5 text-xs text-white shadow-xs focus:border-amber-400 focus:outline-none"
               >
-                <option value="ALL">All Rule Types</option>
-                <option value="GUIDELINE">Guideline</option>
-                <option value="FACT">Fact</option>
-                <option value="CLAIM">Claim</option>
-                <option value="TERM">Term</option>
-                <option value="PROHIBITED_TERM">Prohibited Term</option>
-                <option value="POLICY">Policy</option>
-                <option value="VOICE_RULE">Voice Rule</option>
-                <option value="VISUAL_ASSET">Visual Asset</option>
+                <option value="ALL" className="bg-[#160C2A]">All Rule Types</option>
+                <option value="GUIDELINE" className="bg-[#160C2A]">Guideline</option>
+                <option value="FACT" className="bg-[#160C2A]">Fact</option>
+                <option value="CLAIM" className="bg-[#160C2A]">Claim</option>
+                <option value="TERM" className="bg-[#160C2A]">Term</option>
+                <option value="PROHIBITED_TERM" className="bg-[#160C2A]">Prohibited Term</option>
+                <option value="POLICY" className="bg-[#160C2A]">Policy</option>
+                <option value="VOICE_RULE" className="bg-[#160C2A]">Voice Rule</option>
+                <option value="VISUAL_ASSET" className="bg-[#160C2A]">Visual Asset</option>
               </select>
 
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs shadow-xs focus:border-indigo-500 focus:outline-none"
+                className="rounded-lg border border-purple-800/60 bg-purple-950/60 px-2.5 py-1.5 text-xs text-white shadow-xs focus:border-amber-400 focus:outline-none"
               >
-                <option value="ALL">All Statuses</option>
-                <option value="APPROVED">Approved (Active Evidence)</option>
-                <option value="PENDING">Pending Human Review</option>
-                <option value="REJECTED">Rejected</option>
+                <option value="ALL" className="bg-[#160C2A]">All Statuses</option>
+                <option value="APPROVED" className="bg-[#160C2A]">Approved (Active Evidence)</option>
+                <option value="PENDING" className="bg-[#160C2A]">Pending Human Review</option>
+                <option value="REJECTED" className="bg-[#160C2A]">Rejected</option>
               </select>
             </div>
 
             <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-gray-400" />
+              <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-purple-400/60" />
               <input
                 type="text"
                 placeholder="Search knowledge..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 bg-white py-1.5 pl-8 pr-3 text-xs shadow-xs focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-lg border border-purple-800/60 bg-purple-950/60 py-1.5 pl-8 pr-3 text-xs text-white placeholder-purple-400/40 shadow-xs focus:border-amber-400 focus:outline-none"
               />
             </div>
           </div>
@@ -331,7 +412,7 @@ export default function KnowledgePage() {
           {/* Items List */}
           {loading ? (
             <div className="flex h-64 items-center justify-center">
-              <LoadingSpinner size="lg" />
+              <LoadingSpinner size="lg" className="text-amber-400" />
             </div>
           ) : filteredItems.length > 0 ? (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -344,51 +425,51 @@ export default function KnowledgePage() {
                     : 'warning';
 
                 return (
-                  <Card key={it.id} className="flex flex-col justify-between">
+                  <Card key={it.id} className="flex flex-col justify-between hover:border-amber-500/40">
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <Badge variant="outline" className="font-mono text-[10px]">
+                        <Badge variant="outline" className="font-mono text-[9px] text-amber-300 border-amber-500/40">
                           {it.type}
                         </Badge>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] text-gray-400 font-mono">
+                          <span className="text-[10px] text-purple-400/70 font-mono">
                             v{it.current_version}
                           </span>
                           <Badge variant={statusBadge}>{it.status}</Badge>
                         </div>
                       </div>
-                      <CardTitle className="text-sm font-bold text-gray-900 mt-2">
+                      <CardTitle className="text-sm font-bold text-white mt-2">
                         {it.title}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2 py-2">
-                      <p className="text-xs text-gray-700 leading-relaxed bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                      <p className="text-xs text-purple-200/90 leading-relaxed bg-purple-950/60 p-2.5 rounded-xl border border-purple-900/40">
                         {it.body}
                       </p>
                     </CardContent>
-                    <CardFooter className="flex items-center justify-between border-t border-gray-100 pt-3 text-xs">
+                    <CardFooter className="flex items-center justify-between border-t border-purple-900/30 pt-3 text-xs">
                       {it.status === 'PENDING' ? (
                         <div className="flex items-center gap-2 w-full justify-end">
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => handleRejectItem(it.id)}
-                            className="h-7 text-xs text-red-600 hover:bg-red-50"
+                            className="h-7 text-xs text-red-400 border-red-500/40 hover:bg-red-500/10"
                           >
                             Reject
                           </Button>
                           <Button
                             size="sm"
                             onClick={() => handleApproveItem(it.id)}
-                            className="h-7 text-xs bg-emerald-600 hover:bg-emerald-700"
+                            className="h-7 text-xs font-bold"
                           >
                             Approve as Authoritative
                           </Button>
                         </div>
                       ) : (
                         <div className="flex items-center justify-between w-full">
-                          <span className="text-[11px] text-gray-400">
-                            {it.status === 'APPROVED' ? 'Active in Knowledge Graph' : 'Not used in verification'}
+                          <span className="text-[10px] text-purple-300/60">
+                            {it.status === 'APPROVED' ? 'Active in Knowledge Graph' : 'Quarantined from verification'}
                           </span>
                           {it.status === 'APPROVED' && (
                             <Button
@@ -401,7 +482,7 @@ export default function KnowledgePage() {
                               }}
                               className="h-7 text-xs gap-1"
                             >
-                              <History className="h-3 w-3" />
+                              <History className="h-3 w-3 text-amber-400" />
                               Update (New Version)
                             </Button>
                           )}
@@ -414,8 +495,8 @@ export default function KnowledgePage() {
             </div>
           ) : (
             <Card>
-              <CardContent className="py-16 text-center text-sm text-gray-500">
-                <BookOpen className="mx-auto h-8 w-8 text-gray-300 mb-2" />
+              <CardContent className="py-16 text-center text-xs text-purple-300/60">
+                <BookOpen className="mx-auto h-8 w-8 text-purple-400/40 mb-2" />
                 No knowledge rules match your filters. Add approved brand guidelines or facts above.
               </CardContent>
             </Card>
@@ -425,20 +506,20 @@ export default function KnowledgePage() {
         {/* Tab 2: Source Documents */}
         <TabsContent value="SOURCES" className="space-y-4 pt-2">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Approved Source Documents</CardTitle>
-              <CardDescription>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-bold text-white">Approved Source Documents</CardTitle>
+              <CardDescription className="text-xs text-purple-200/70">
                 Uploaded policy manuals, PDFs, and guideline sheets. Rules extracted from documents remain pending until authorized.
               </CardDescription>
             </CardHeader>
             <CardContent>
               {sources.length > 0 ? (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-purple-900/30">
                   {sources.map((s) => (
                     <div key={s.id} className="flex items-center justify-between py-3.5">
                       <div className="space-y-1">
-                        <p className="text-sm font-semibold text-gray-900">{s.title}</p>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <p className="text-xs font-bold text-white">{s.title}</p>
+                        <div className="flex items-center gap-2 text-[11px] text-purple-300/60">
                           <span>Kind: {s.kind}</span>
                           <span>•</span>
                           <span>Uploaded: {new Date(s.created_at).toLocaleDateString()}</span>
@@ -455,6 +536,7 @@ export default function KnowledgePage() {
                               await approveSource(s.id);
                               await loadAll();
                             }}
+                            className="font-bold text-xs"
                           >
                             Approve
                           </Button>
@@ -464,7 +546,7 @@ export default function KnowledgePage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-center text-sm text-gray-500 py-8">
+                <p className="text-center text-xs text-purple-300/60 py-8">
                   No source documents uploaded yet.
                 </p>
               )}
@@ -475,16 +557,16 @@ export default function KnowledgePage() {
         {/* Tab 3: Brand Identity & Tone Profile */}
         <TabsContent value="PROFILE" className="space-y-4 pt-2">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Brand Identity & Voice Profile</CardTitle>
-              <CardDescription>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-bold text-white">Brand Identity & Voice Profile</CardTitle>
+              <CardDescription className="text-xs text-purple-200/70">
                 High-level brand guidelines evaluated by Agent 4 for tone, voice personality, and approved colors.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSaveProfile} className="space-y-4">
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-gray-700">
+                  <label className="mb-1 block text-xs font-medium text-purple-200">
                     Brand Name *
                   </label>
                   <Input
@@ -495,7 +577,7 @@ export default function KnowledgePage() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-gray-700">
+                  <label className="mb-1 block text-xs font-medium text-purple-200">
                     Brand Description & Purpose
                   </label>
                   <Textarea
@@ -506,7 +588,7 @@ export default function KnowledgePage() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-gray-700">
+                  <label className="mb-1 block text-xs font-medium text-purple-200">
                     Voice & Tone Attributes (JSON or descriptive text)
                   </label>
                   <Textarea
@@ -518,7 +600,7 @@ export default function KnowledgePage() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-gray-700">
+                  <label className="mb-1 block text-xs font-medium text-purple-200">
                     Approved Brand Palette Hex Colors (Comma-separated)
                   </label>
                   <Input
@@ -528,7 +610,7 @@ export default function KnowledgePage() {
                   />
                 </div>
 
-                <Button type="submit" isLoading={profileSaving}>
+                <Button type="submit" isLoading={profileSaving} className="font-bold shadow-gold-sm">
                   Save Brand Profile
                 </Button>
               </form>
@@ -546,27 +628,27 @@ export default function KnowledgePage() {
       >
         <form onSubmit={handleCreateItem} className="space-y-4 pt-2">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-purple-200 mb-1">
               Rule Type *
             </label>
             <select
               value={newItemType}
               onChange={(e) => setNewItemType(e.target.value as any)}
-              className="w-full rounded-md border border-gray-300 bg-white p-2 text-xs"
+              className="w-full rounded-lg border border-purple-800/60 bg-purple-950/60 p-2 text-xs text-white"
             >
-              <option value="FACT">Fact (Verified organizational data)</option>
-              <option value="POLICY">Policy (Regulatory or corporate rules)</option>
-              <option value="GUIDELINE">Guideline (Communication standards)</option>
-              <option value="CLAIM">Claim (Marketing & benchmark claims)</option>
-              <option value="TERM">Term (Approved product & company naming)</option>
-              <option value="PROHIBITED_TERM">Prohibited Term (Banned keywords)</option>
-              <option value="VOICE_RULE">Voice Rule (Channel-specific rules)</option>
-              <option value="VISUAL_ASSET">Visual Asset (Logo & imagery rules)</option>
+              <option value="FACT" className="bg-[#160C2A]">Fact (Verified organizational data)</option>
+              <option value="POLICY" className="bg-[#160C2A]">Policy (Regulatory or corporate rules)</option>
+              <option value="GUIDELINE" className="bg-[#160C2A]">Guideline (Communication standards)</option>
+              <option value="CLAIM" className="bg-[#160C2A]">Claim (Marketing & benchmark claims)</option>
+              <option value="TERM" className="bg-[#160C2A]">Term (Approved product & company naming)</option>
+              <option value="PROHIBITED_TERM" className="bg-[#160C2A]">Prohibited Term (Banned keywords)</option>
+              <option value="VOICE_RULE" className="bg-[#160C2A]">Voice Rule (Channel-specific rules)</option>
+              <option value="VISUAL_ASSET" className="bg-[#160C2A]">Visual Asset (Logo & imagery rules)</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-purple-200 mb-1">
               Title / Descriptor *
             </label>
             <Input
@@ -578,7 +660,7 @@ export default function KnowledgePage() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-purple-200 mb-1">
               Rule Statement / Approved Evidence *
             </label>
             <Textarea
@@ -590,11 +672,11 @@ export default function KnowledgePage() {
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-gray-100">
+          <div className="flex justify-end gap-2 pt-3 border-t border-purple-900/30">
             <Button variant="outline" type="button" onClick={() => setCreateItemModal(false)}>
               Cancel
             </Button>
-            <Button type="submit" isLoading={itemSubmitting}>
+            <Button type="submit" isLoading={itemSubmitting} className="font-bold shadow-gold-sm">
               Create Item
             </Button>
           </div>
@@ -610,11 +692,11 @@ export default function KnowledgePage() {
       >
         <form onSubmit={handleCreateVersion} className="space-y-4 pt-2">
           <Alert variant="warning" title="Change Impact Notice">
-            Creating a new version does not overwrite the past. Connected content reviews will be flagged in the Change Impact explorer for reassessment.
+            Creating a new version does not overwrite historical records. Connected reviews will be flagged in the Change Impact explorer for reassessment.
           </Alert>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-purple-200 mb-1">
               Updated Statement / Evidence *
             </label>
             <Textarea
@@ -626,7 +708,7 @@ export default function KnowledgePage() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-purple-200 mb-1">
               Audit Change Note / Rationale *
             </label>
             <Input
@@ -637,11 +719,11 @@ export default function KnowledgePage() {
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-gray-100">
+          <div className="flex justify-end gap-2 pt-3 border-t border-purple-900/30">
             <Button variant="outline" type="button" onClick={() => setVersionModal(null)}>
               Cancel
             </Button>
-            <Button type="submit" isLoading={versionSubmitting} className="bg-indigo-600 hover:bg-indigo-700">
+            <Button type="submit" isLoading={versionSubmitting} className="font-bold shadow-gold-sm">
               Commit Version & Propagate Impact
             </Button>
           </div>
@@ -657,7 +739,7 @@ export default function KnowledgePage() {
       >
         <form onSubmit={handleUploadSource} className="space-y-4 pt-2">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-purple-200 mb-1">
               Document Title *
             </label>
             <Input
@@ -669,22 +751,22 @@ export default function KnowledgePage() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-purple-200 mb-1">
               File Attachment
             </label>
             <input
               type="file"
               accept=".pdf,.docx,.pptx,.txt,.md"
               onChange={(e) => setSourceFile(e.target.files?.[0] || null)}
-              className="w-full text-xs"
+              className="w-full text-xs text-purple-300"
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-gray-100">
+          <div className="flex justify-end gap-2 pt-3 border-t border-purple-900/30">
             <Button variant="outline" type="button" onClick={() => setUploadSourceModal(false)}>
               Cancel
             </Button>
-            <Button type="submit" isLoading={sourceSubmitting}>
+            <Button type="submit" isLoading={sourceSubmitting} className="font-bold shadow-gold-sm">
               Upload & Ingest
             </Button>
           </div>

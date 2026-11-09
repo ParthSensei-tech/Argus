@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
@@ -24,6 +26,7 @@ import {
   CheckCircle2,
   Clock,
   ExternalLink,
+  Crown,
 } from 'lucide-react';
 
 export default function ImpactEventsPage() {
@@ -83,42 +86,47 @@ export default function ImpactEventsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-gray-200 pb-5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-purple-900/40 pb-5">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-            Change Impact Knowledge Events
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-extrabold tracking-tight gold-gradient-text">
+              Change Impact Knowledge Events
+            </h1>
+            <Badge variant="default">
+              <Crown className="h-3 w-3 mr-1" /> Blast-Radius Tracing
+            </Badge>
+          </div>
+          <p className="mt-1 text-xs text-purple-200/70">
             Automated graph traversal discovering previously reviewed or approved content affected when brand rules or verified facts change.
           </p>
         </div>
 
         <Link href="/graph">
-          <Button variant="outline" size="sm" className="gap-2">
-            <GitBranch className="h-4 w-4" />
-            Explore Graph Explorer
+          <Button variant="outline" size="sm" className="gap-2 font-semibold text-xs">
+            <GitBranch className="h-4 w-4 text-amber-400" />
+            Explore Knowledge Graph
           </Button>
         </Link>
       </div>
 
       {/* Events Table / Cards */}
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <ShieldAlert className="h-5 w-5 text-amber-500" />
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-bold flex items-center gap-2 text-white">
+            <ShieldAlert className="h-5 w-5 text-amber-400" />
             Active Impact Events ({events.length})
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs text-purple-200/70">
             When an administrator updates an approved fact or policy, Argus tracks all historical downstream reviews.
           </CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
             <div className="flex h-48 items-center justify-center">
-              <LoadingSpinner size="lg" />
+              <LoadingSpinner size="lg" className="text-amber-400" />
             </div>
           ) : events.length > 0 ? (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-purple-900/30">
               {events.map((ev) => {
                 const sevBadge =
                   ev.severity === 'HIGH' || ev.severity === 'CRITICAL'
@@ -130,25 +138,25 @@ export default function ImpactEventsPage() {
                 return (
                   <div
                     key={ev.id}
-                    className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between hover:bg-gray-50/50 px-2 rounded-lg transition"
+                    className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between hover:bg-purple-900/20 px-2 rounded-xl transition"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <Badge variant={sevBadge} className="text-[10px]">
+                        <Badge variant={sevBadge} className="text-[9px]">
                           {ev.severity} IMPACT
                         </Badge>
-                        <Badge variant="outline" className="font-mono text-[10px]">
+                        <Badge variant="outline" className="font-mono text-[9px] text-amber-300 border-amber-500/40">
                           v{ev.from_version} → v{ev.to_version}
                         </Badge>
-                        <span className="text-xs font-semibold text-gray-900">
+                        <span className="text-xs font-semibold text-white">
                           {ev.status}
                         </span>
                       </div>
-                      <p className="text-xs font-medium text-gray-800">
+                      <p className="text-xs font-medium text-purple-100">
                         {ev.change_summary}
                       </p>
-                      <div className="flex items-center gap-2 text-[11px] text-gray-500">
-                        <span>Affected downstream items: <strong>{ev.affected_count}</strong></span>
+                      <div className="flex items-center gap-2 text-[11px] text-purple-300/60">
+                        <span>Affected downstream items: <strong className="text-amber-300">{ev.affected_count}</strong></span>
                         <span>•</span>
                         <span>Logged: {new Date(ev.created_at).toLocaleString()}</span>
                       </div>
@@ -168,7 +176,7 @@ export default function ImpactEventsPage() {
                           size="sm"
                           onClick={() => handleReassess(ev.id)}
                           isLoading={reassessing === ev.id}
-                          className="gap-1.5 text-xs bg-indigo-600 hover:bg-indigo-700"
+                          className="gap-1.5 text-xs font-bold shadow-gold-sm"
                         >
                           <RotateCw className="h-3.5 w-3.5" />
                           Reassess Content
@@ -180,8 +188,8 @@ export default function ImpactEventsPage() {
               })}
             </div>
           ) : (
-            <div className="py-12 text-center text-sm text-gray-500">
-              <CheckCircle2 className="mx-auto h-8 w-8 text-emerald-500 mb-2" />
+            <div className="py-12 text-center text-xs text-purple-300/60">
+              <CheckCircle2 className="mx-auto h-8 w-8 text-emerald-400 mb-2" />
               All verified content is up to date with the latest brand knowledge versions.
             </div>
           )}
@@ -197,30 +205,32 @@ export default function ImpactEventsPage() {
       >
         {selectedEvent && (
           <div className="space-y-4 pt-2 text-xs">
-            <div className="rounded-lg bg-gray-50 p-3 border border-gray-100 space-y-1.5">
+            <div className="rounded-xl bg-purple-950/70 p-3 border border-purple-800/50 space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-gray-700">Change Rationale</span>
-                <Badge variant="outline">v{selectedEvent.event.from_version} → v{selectedEvent.event.to_version}</Badge>
+                <span className="font-semibold text-purple-200">Change Rationale</span>
+                <Badge variant="outline" className="text-amber-300 border-amber-500/40">
+                  v{selectedEvent.event.from_version} → v{selectedEvent.event.to_version}
+                </Badge>
               </div>
-              <p className="text-gray-900 font-medium">{selectedEvent.event.change_summary}</p>
+              <p className="text-white font-medium">{selectedEvent.event.change_summary}</p>
             </div>
 
             <div>
-              <h5 className="font-bold text-gray-900 mb-2">
+              <h5 className="font-bold text-white mb-2 text-xs">
                 Affected Downstream Entities ({selectedEvent.affected?.length || 0})
               </h5>
               {selectedEvent.affected && selectedEvent.affected.length > 0 ? (
-                <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                <div className="space-y-2 max-h-56 overflow-y-auto pr-1 scrollbar-thin">
                   {selectedEvent.affected.map((aff: any) => (
                     <div
                       key={aff.id}
-                      className="flex items-center justify-between rounded border border-gray-200 bg-white p-2.5"
+                      className="flex items-center justify-between rounded-xl border border-purple-800/50 bg-purple-950/60 p-2.5"
                     >
                       <div>
                         <Badge variant="secondary" className="text-[9px] mb-1">
                           {aff.entity_type} (Depth {aff.depth})
                         </Badge>
-                        <p className="font-semibold text-gray-900">{aff.label}</p>
+                        <p className="font-semibold text-white">{aff.label}</p>
                       </div>
                       {aff.ref_id && aff.entity_type === 'REVIEW' && (
                         <Link href={`/reviews/${aff.ref_id}`}>
@@ -233,11 +243,11 @@ export default function ImpactEventsPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 italic">No historical content directly depends on this item.</p>
+                <p className="text-purple-400/60 italic">No historical content directly depends on this item.</p>
               )}
             </div>
 
-            <div className="flex justify-end gap-2 pt-3 border-t border-gray-100">
+            <div className="flex justify-end gap-2 pt-3 border-t border-purple-900/30">
               <Button variant="outline" onClick={() => setSelectedEvent(null)}>
                 Close
               </Button>
@@ -245,7 +255,7 @@ export default function ImpactEventsPage() {
                 <Button
                   onClick={() => handleReassess(selectedEvent.event.id)}
                   isLoading={reassessing === selectedEvent.event.id}
-                  className="bg-indigo-600 hover:bg-indigo-700"
+                  className="font-bold shadow-gold-sm"
                 >
                   Trigger Fresh Review
                 </Button>

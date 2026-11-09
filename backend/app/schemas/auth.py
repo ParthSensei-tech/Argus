@@ -14,6 +14,10 @@ class LoginIn(BaseModel):
     password: str
 
 
+class DemoLoginIn(BaseModel):
+    role: str = "admin"  # "admin", "reviewer", "editor"
+
+
 class TokenOut(BaseModel):
     access_token: str
     token_type: str = "bearer"

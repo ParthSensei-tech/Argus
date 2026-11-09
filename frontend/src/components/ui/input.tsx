@@ -15,7 +15,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-sm font-medium text-gray-700"
+            className="text-xs font-medium text-purple-200"
           >
             {label}
           </label>
@@ -24,12 +24,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           className={[
-            'block w-full rounded-lg border bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-colors',
-            'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent',
-            'disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500',
+            'block w-full rounded-lg border px-3 py-2 text-xs text-white placeholder-purple-400/40 shadow-sm transition-all',
+            'bg-purple-950/60 border-purple-800/60 hover:border-purple-700',
+            'focus:outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400',
+            'disabled:cursor-not-allowed disabled:bg-purple-950/30 disabled:text-purple-500',
             error
               ? 'border-red-400 focus:ring-red-400'
-              : 'border-gray-300 hover:border-gray-400',
+              : '',
             className,
           ].join(' ')}
           aria-invalid={error ? 'true' : undefined}
@@ -39,12 +40,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {error && (
-          <p id={`${inputId}-error`} className="text-xs text-red-600" role="alert">
+          <p id={`${inputId}-error`} className="text-xs text-red-400" role="alert">
             {error}
           </p>
         )}
         {hint && !error && (
-          <p id={`${inputId}-hint`} className="text-xs text-gray-500">
+          <p id={`${inputId}-hint`} className="text-[11px] text-purple-300/60">
             {hint}
           </p>
         )}

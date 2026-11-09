@@ -36,7 +36,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label
             htmlFor={selectId}
-            className="text-sm font-medium text-gray-700"
+            className="text-xs font-medium text-purple-200"
           >
             {label}
           </label>
@@ -45,17 +45,18 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           ref={ref}
           id={selectId}
           className={[
-            'block w-full rounded-lg border bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors appearance-none',
-            'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent',
-            'disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500',
+            'block w-full rounded-lg border px-3 py-2 text-xs text-white shadow-sm transition-all appearance-none',
+            'bg-purple-950/60 border-purple-800/60 hover:border-purple-700',
+            'focus:outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400',
+            'disabled:cursor-not-allowed disabled:bg-purple-950/30 disabled:text-purple-500',
             error
               ? 'border-red-400 focus:ring-red-400'
-              : 'border-gray-300 hover:border-gray-400',
+              : '',
             className,
           ].join(' ')}
           aria-invalid={error ? 'true' : undefined}
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23f59e0b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
             backgroundPosition: 'right 0.5rem center',
             backgroundRepeat: 'no-repeat',
             backgroundSize: '1.5em 1.5em',
@@ -64,25 +65,25 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           {...props}
         >
           {placeholder && (
-            <option value="" disabled>
+            <option value="" disabled className="bg-[#160C2A] text-purple-300">
               {placeholder}
             </option>
           )}
           {options
             ? options.map((opt) => (
-                <option key={opt.value} value={opt.value} disabled={opt.disabled}>
+                <option key={opt.value} value={opt.value} disabled={opt.disabled} className="bg-[#160C2A] text-white">
                   {opt.label}
                 </option>
               ))
             : children}
         </select>
         {error && (
-          <p className="text-xs text-red-600" role="alert">
+          <p className="text-xs text-red-400" role="alert">
             {error}
           </p>
         )}
         {hint && !error && (
-          <p className="text-xs text-gray-500">{hint}</p>
+          <p className="text-[11px] text-purple-300/60">{hint}</p>
         )}
       </div>
     );

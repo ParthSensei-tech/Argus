@@ -18,23 +18,23 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<ButtonVariant, string> = {
   default:
-    'bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 shadow-sm',
+    'bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-purple-950 font-bold hover:brightness-110 active:brightness-95 shadow-gold-sm border border-amber-400/50',
   destructive:
-    'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-sm',
+    'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-sm border border-red-500/40',
   outline:
-    'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100 shadow-sm',
+    'border border-amber-500/30 bg-purple-950/40 text-amber-300 hover:bg-amber-500/15 hover:border-amber-400/60 active:bg-amber-500/20 shadow-sm',
   secondary:
-    'bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300',
+    'bg-purple-900/60 text-purple-100 hover:bg-purple-800/80 active:bg-purple-800 border border-purple-700/40',
   ghost:
-    'text-gray-700 hover:bg-gray-100 active:bg-gray-200',
+    'text-purple-200/80 hover:bg-purple-900/40 hover:text-white active:bg-purple-900/60',
   link:
-    'text-indigo-600 underline-offset-4 hover:underline p-0 h-auto',
+    'text-amber-400 underline-offset-4 hover:underline hover:text-amber-300 p-0 h-auto font-medium',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'h-8 px-3 text-sm rounded-md gap-1.5',
-  default: 'h-10 px-4 text-sm rounded-lg gap-2',
-  lg: 'h-12 px-6 text-base rounded-lg gap-2',
+  sm: 'h-8 px-3 text-xs rounded-md gap-1.5',
+  default: 'h-10 px-4 text-xs font-semibold rounded-lg gap-2',
+  lg: 'h-12 px-6 text-sm font-semibold rounded-lg gap-2',
 };
 
 export function Button({
@@ -48,39 +48,44 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
+      disabled={disabled || isLoading}
       className={[
-        'inline-flex items-center justify-center font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+        'inline-flex items-center justify-center font-medium transition-all duration-150',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090412]',
+        'disabled:pointer-events-none disabled:opacity-50',
         variantClasses[variant],
-        variant !== 'link' ? sizeClasses[size] : '',
+        sizeClasses[size],
         className,
       ].join(' ')}
-      disabled={disabled || isLoading}
       {...props}
     >
-      {isLoading && (
-        <svg
-          className="mr-2 h-4 w-4 animate-spin"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-          />
-        </svg>
+      {isLoading ? (
+        <>
+          <svg
+            className="animate-spin -ml-1 mr-2 h-4 w-4"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v8H4z"
+            />
+          </svg>
+          Loading...
+        </>
+      ) : (
+        children
       )}
-      {children}
     </button>
   );
 }

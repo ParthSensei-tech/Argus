@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -41,6 +43,7 @@ import {
   User,
   ArrowRight,
   GitBranch,
+  Crown,
 } from 'lucide-react';
 
 export default function ReviewDetailPage() {
@@ -75,7 +78,6 @@ export default function ReviewDetailPage() {
       const data = await getReview(reviewId);
       setDetail(data);
 
-      // Auto-poll if review is in active pipeline state
       const activeStates = ['QUEUED', 'EXTRACTING', 'LOADING_KNOWLEDGE', 'ANALYZING', 'RESOLVING', 'CORRECTING'];
       if (activeStates.includes(data.review.status)) {
         setPolling(true);
@@ -93,7 +95,6 @@ export default function ReviewDetailPage() {
     fetchDetail();
   }, [reviewId]);
 
-  // Polling loop for running agents
   useEffect(() => {
     if (!polling) return;
     const interval = setInterval(() => {
@@ -150,8 +151,8 @@ export default function ReviewDetailPage() {
   if (loading || !detail) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center space-y-4">
-        <LoadingSpinner size="lg" />
-        <p className="text-sm font-medium text-gray-500">Retrieving governance audit...</p>
+        <LoadingSpinner size="lg" className="text-amber-400" />
+        <p className="text-xs font-semibold text-amber-300/80">Retrieving governance audit...</p>
       </div>
     );
   }
@@ -175,26 +176,26 @@ export default function ReviewDetailPage() {
   return (
     <div className="space-y-8">
       {/* Top Breadcrumb & Actions */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between border-b border-gray-200 pb-5">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between border-b border-purple-900/40 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <Link href="/reviews" className="text-xs text-gray-500 hover:text-indigo-600">
+            <Link href="/reviews" className="text-xs text-purple-400/80 hover:text-amber-300">
               Reviews
             </Link>
-            <span className="text-gray-400">/</span>
-            <span className="text-xs font-semibold text-gray-700">Governance Audit</span>
+            <span className="text-purple-600">/</span>
+            <span className="text-xs font-semibold text-amber-400">Governance Audit Cockpit</span>
           </div>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-gray-900">
+          <h1 className="mt-1 text-2xl font-extrabold tracking-tight gold-gradient-text">
             {content.title}
           </h1>
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-500">
-            <span>Version: <strong className="text-gray-900">v{content.version}</strong></span>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-purple-300/70">
+            <span>Version: <strong className="text-white">v{content.version}</strong></span>
             <span>•</span>
-            <span>Modality: <strong className="text-gray-900">{content.input_type}</strong></span>
+            <span>Modality: <strong className="text-amber-300">{content.input_type}</strong></span>
             <span>•</span>
-            <span>Channel: <strong className="capitalize text-gray-900">{content.channel}</strong></span>
+            <span>Channel: <strong className="capitalize text-white">{content.channel}</strong></span>
             <span>•</span>
-            <span>Audience: <strong className="text-gray-900">{content.audience}</strong></span>
+            <span>Audience: <strong className="text-white">{content.audience}</strong></span>
             {review.ai_mode && (
               <>
                 <span>•</span>
@@ -226,7 +227,7 @@ export default function ReviewDetailPage() {
                 setSelectedDecision('APPROVE');
                 setDecisionModalOpen(true);
               }}
-              className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="gap-2 font-bold shadow-gold-sm"
             >
               <Check className="h-4 w-4" />
               Make Governance Decision
@@ -234,8 +235,8 @@ export default function ReviewDetailPage() {
           )}
 
           {review.decision && (
-            <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 shadow-xs">
-              <span className="text-xs text-gray-500">Recorded Decision:</span>
+            <div className="flex items-center gap-2 rounded-lg border border-amber-500/30 bg-purple-950/60 px-3 py-1.5">
+              <span className="text-xs text-purple-300/80">Recorded Decision:</span>
               <Badge variant={review.decision === 'APPROVE' ? 'success' : 'destructive'}>
                 {review.decision}
               </Badge>
@@ -249,33 +250,33 @@ export default function ReviewDetailPage() {
         className={[
           'border-l-4',
           review.status === 'COMPLETED'
-            ? 'border-l-emerald-500 bg-emerald-50/20'
+            ? 'border-l-emerald-500 bg-emerald-950/20'
             : review.status === 'FAILED'
-            ? 'border-l-red-500 bg-red-50/20'
+            ? 'border-l-red-500 bg-red-950/20'
             : review.status === 'AWAITING_REVIEW'
-            ? 'border-l-amber-500 bg-amber-50/20'
-            : 'border-l-indigo-500 bg-indigo-50/20',
+            ? 'border-l-amber-500 bg-amber-950/20'
+            : 'border-l-purple-500 bg-purple-950/20',
         ].join(' ')}
       >
         <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4">
           <div className="flex items-center gap-3">
             {review.status === 'COMPLETED' ? (
-              <CheckCircle2 className="h-6 w-6 text-emerald-600" />
+              <CheckCircle2 className="h-6 w-6 text-emerald-400" />
             ) : review.status === 'FAILED' ? (
-              <AlertTriangle className="h-6 w-6 text-red-600" />
+              <AlertTriangle className="h-6 w-6 text-red-400" />
             ) : review.status === 'AWAITING_REVIEW' ? (
-              <Clock className="h-6 w-6 text-amber-600" />
+              <Clock className="h-6 w-6 text-amber-400" />
             ) : (
-              <LoadingSpinner size="default" />
+              <LoadingSpinner size="default" className="text-amber-400" />
             )}
             <div>
               <div className="flex items-center gap-2">
-                <h4 className="text-sm font-bold text-gray-900">
+                <h4 className="text-sm font-bold text-white">
                   Status: {review.status.replace(/_/g, ' ')}
                 </h4>
                 {review.risk && <Badge variant={riskBadge}>{review.risk} RISK</Badge>}
               </div>
-              <p className="text-xs text-gray-600 mt-0.5">
+              <p className="text-xs text-purple-200/70 mt-0.5">
                 {review.status === 'AWAITING_REVIEW'
                   ? 'The 7-agent swarm completed verification. Review findings and suggestions below before authorizing.'
                   : review.status === 'COMPLETED'
@@ -289,26 +290,26 @@ export default function ReviewDetailPage() {
 
           <Link href="/graph">
             <Button variant="outline" size="sm" className="gap-1.5 text-xs shrink-0">
-              <GitBranch className="h-3.5 w-3.5 text-indigo-600" />
+              <GitBranch className="h-3.5 w-3.5 text-amber-400" />
               Trace in Graph
             </Button>
           </Link>
         </CardContent>
       </Card>
 
-      {/* 7-Agent Execution Architecture */}
+      {/* 7-Agent Execution Architecture Telemetry */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center justify-between">
+          <CardTitle className="text-sm font-bold flex items-center justify-between text-white">
             <span className="flex items-center gap-2">
-              <Activity className="h-4 w-4 text-indigo-600" />
-              Coordinated Seven-Agent Execution Logs
+              <Activity className="h-4 w-4 text-amber-400" />
+              Coordinated Seven-Agent Execution Telemetry
             </span>
-            <span className="text-xs font-normal text-gray-500">
-              Correlation ID: <code className="text-gray-800">{review.correlation_id.slice(0, 8)}</code>
+            <span className="text-[10px] font-normal text-purple-300/60">
+              Correlation ID: <code className="text-amber-300">{review.correlation_id.slice(0, 8)}</code>
             </span>
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs text-purple-200/70">
             Each specialist runs with its own strict schema contract, scoped prompt instructions, and validated output.
           </CardDescription>
         </CardHeader>
@@ -327,18 +328,18 @@ export default function ReviewDetailPage() {
               return (
                 <div
                   key={ag.id}
-                  className="rounded-lg border border-gray-200 bg-gray-50/50 p-3 text-xs space-y-1.5"
+                  className="rounded-xl border border-purple-800/40 bg-purple-950/40 p-3 text-xs space-y-1.5"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-gray-900 truncate" title={ag.name}>
+                    <span className="font-semibold text-white truncate" title={ag.name}>
                       Agent {ag.agent_id}
                     </span>
-                    <Badge variant={statusBadge} className="text-[10px] px-1.5 py-0">
+                    <Badge variant={statusBadge} className="text-[9px] px-1.5 py-0">
                       {ag.status}
                     </Badge>
                   </div>
-                  <p className="text-[11px] text-gray-600 truncate">{ag.name.replace(/^Agent \d+: /, '')}</p>
-                  <div className="flex items-center justify-between text-[10px] text-gray-400 border-t border-gray-100 pt-1">
+                  <p className="text-[11px] text-purple-300/80 truncate">{ag.name.replace(/^Agent \d+: /, '')}</p>
+                  <div className="flex items-center justify-between text-[10px] text-purple-400/60 border-t border-purple-900/30 pt-1">
                     <span>Model: {ag.model || 'deterministic'}</span>
                     <span>Tokens: {ag.tokens_in + ag.tokens_out}</span>
                   </div>
@@ -352,21 +353,21 @@ export default function ReviewDetailPage() {
       {/* Critical Blocker Alert if Critical Findings Exist */}
       {hasCriticalBlocker && (
         <Alert variant="destructive" title="Governance Blocked: Unresolved CRITICAL Finding(s)">
-          This submission contains {criticalFindings.length} critical issue(s) that conflict with approved organizational policy.
-          Standard approval is blocked. Only an authorized reviewer can override with an explicit audit rationale.
+          This submission contains {criticalFindings.length} critical issue(s) conflicting with approved brand policy.
+          Standard approval is locked. An authorized reviewer must supply an explicit audit override justification to sign off.
         </Alert>
       )}
 
       {/* Main Analysis Section: Findings & Evidence */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Findings Panel (2 columns) */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-gray-900">
-              Evidence-Linked Findings ({findings.length})
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <span>Evidence-Linked Findings ({findings.length})</span>
             </h3>
-            <span className="text-xs text-gray-500">
-              Traceable to approved facts, guidelines & prohibited terms
+            <span className="text-[11px] text-purple-300/60">
+              Grounded in active approved facts & policies
             </span>
           </div>
 
@@ -390,21 +391,21 @@ export default function ReviewDetailPage() {
                       ? 'border-l-red-500'
                       : f.severity === 'MAJOR'
                       ? 'border-l-amber-500'
-                      : 'border-l-indigo-400',
+                      : 'border-l-purple-400',
                   ].join(' ')}
                 >
-                  <CardHeader className="bg-gray-50/40 pb-3">
+                  <CardHeader className="bg-purple-950/40 pb-3 border-b border-purple-900/30">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <Badge variant={severityBadge}>{f.severity}</Badge>
-                        <Badge variant="outline" className="font-mono text-[10px]">
+                        <Badge variant="outline" className="font-mono text-[10px] text-purple-300 border-purple-700/60">
                           {f.status}
                         </Badge>
-                        <span className="text-xs font-semibold text-gray-700">
+                        <span className="text-xs font-semibold text-white">
                           {f.category.replace(/_/g, ' ')}
                         </span>
                       </div>
-                      <span className="text-[11px] text-gray-500 font-medium">
+                      <span className="text-[10px] text-amber-400/90 font-medium">
                         Confidence: {(f.confidence * 100).toFixed(0)}%
                       </span>
                     </div>
@@ -412,11 +413,11 @@ export default function ReviewDetailPage() {
                   <CardContent className="pt-4 space-y-3">
                     {/* Original Claimed Text */}
                     {f.original_text && (
-                      <div className="rounded-md border border-gray-200 bg-gray-50 p-2.5 text-xs">
-                        <span className="font-semibold text-gray-500 uppercase text-[10px] block mb-1">
+                      <div className="rounded-lg border border-purple-800/60 bg-purple-950/60 p-2.5 text-xs">
+                        <span className="font-bold text-amber-400/80 uppercase text-[9px] block mb-1">
                           Evaluated Text Segment
                         </span>
-                        <p className="font-mono text-gray-900 italic font-medium">
+                        <p className="font-mono text-purple-100 italic font-medium">
                           &ldquo;{f.original_text}&rdquo;
                         </p>
                       </div>
@@ -424,11 +425,11 @@ export default function ReviewDetailPage() {
 
                     {/* Finding Explanation */}
                     <div>
-                      <p className="text-xs leading-relaxed text-gray-800">
+                      <p className="text-xs leading-relaxed text-purple-200">
                         {f.explanation}
                       </p>
                       {f.resolution_note && (
-                        <p className="mt-1 text-[11px] text-indigo-700 italic">
+                        <p className="mt-1 text-[11px] text-amber-400/80 italic">
                           Adjudication note: {f.resolution_note}
                         </p>
                       )}
@@ -436,24 +437,27 @@ export default function ReviewDetailPage() {
 
                     {/* Traceable Evidence References */}
                     {f.evidence && f.evidence.length > 0 && (
-                      <div className="rounded-lg border border-indigo-100 bg-indigo-50/40 p-3 space-y-2">
-                        <div className="flex items-center gap-1.5 text-xs font-semibold text-indigo-900">
-                          <Layers className="h-3.5 w-3.5" />
+                      <div className="rounded-xl border border-amber-500/25 bg-purple-950/50 p-3 space-y-2">
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-300">
+                          <Layers className="h-3.5 w-3.5 text-amber-400" />
                           <span>Approved Evidence Citations ({f.evidence.length})</span>
                         </div>
                         {f.evidence.map((ev) => (
-                          <div key={ev.id} className="text-xs text-indigo-950 border-t border-indigo-100/60 pt-2 space-y-1">
+                          <div key={ev.id} className="text-xs text-purple-200 border-t border-purple-800/40 pt-2 space-y-1">
                             <div className="flex items-center justify-between">
-                              <span className="font-semibold">
-                                Relation: <Badge variant={ev.relation === 'CONTRADICTS' ? 'destructive' : 'success'} className="text-[9px] py-0 px-1 ml-1">{ev.relation}</Badge>
+                              <span className="font-semibold text-xs">
+                                Relation:{' '}
+                                <Badge variant={ev.relation === 'CONTRADICTS' ? 'destructive' : 'success'} className="text-[9px] py-0 px-1 ml-1">
+                                  {ev.relation}
+                                </Badge>
                               </span>
                               {ev.knowledge_version && (
-                                <span className="text-[10px] text-indigo-600 font-mono">
+                                <span className="text-[10px] text-amber-400 font-mono">
                                   Approved v{ev.knowledge_version}
                                 </span>
                               )}
                             </div>
-                            <p className="italic text-gray-700 bg-white/70 p-1.5 rounded border border-indigo-100/50">
+                            <p className="italic text-purple-200/90 bg-purple-900/30 p-2 rounded-lg border border-purple-800/40 font-serif">
                               &ldquo;{ev.excerpt}&rdquo;
                             </p>
                           </div>
@@ -466,8 +470,8 @@ export default function ReviewDetailPage() {
             })
           ) : (
             <Card>
-              <CardContent className="py-12 text-center text-sm text-gray-500">
-                <ShieldCheck className="mx-auto h-8 w-8 text-emerald-500 mb-2" />
+              <CardContent className="py-12 text-center text-xs text-purple-300/70">
+                <ShieldCheck className="mx-auto h-8 w-8 text-emerald-400 mb-2" />
                 No policy violations detected. Content complies with approved brand guidelines.
               </CardContent>
             </Card>
@@ -477,37 +481,40 @@ export default function ReviewDetailPage() {
         {/* Suggested Corrections & Original Content (1 column) */}
         <div className="space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-indigo-600" />
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-bold flex items-center gap-2 text-white">
+                <Sparkles className="h-4 w-4 text-amber-400" />
                 Intent-Constrained Corrections
               </CardTitle>
-              <CardDescription>
-                Agent 7 suggestions that preserve the creator&apos;s goal while resolving brand violations.
+              <CardDescription className="text-xs text-purple-200/70">
+                Agent 7 diff suggestions that preserve creator intent while resolving violations.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3.5">
               {corrections.length > 0 ? (
                 corrections.map((c) => (
                   <div
                     key={c.id}
-                    className="rounded-lg border border-gray-200 bg-gray-50/60 p-3.5 text-xs space-y-2.5"
+                    className="rounded-xl border border-purple-800/60 bg-purple-950/40 p-3 text-xs space-y-2"
                   >
                     <div>
-                      <span className="text-[10px] font-semibold uppercase text-red-600">Original</span>
-                      <p className="line-through text-gray-500 font-mono mt-0.5">{c.original_text}</p>
+                      <span className="text-[9px] font-bold uppercase text-red-400">Original Copy</span>
+                      <p className="line-through text-red-300/80 font-mono mt-0.5 text-[11px]">{c.original_text}</p>
                     </div>
 
                     <div>
-                      <span className="text-[10px] font-semibold uppercase text-emerald-600">Suggested Resolution</span>
-                      <p className="text-gray-900 font-semibold font-mono mt-0.5">{c.suggested_text}</p>
+                      <span className="text-[9px] font-bold uppercase text-emerald-400">Suggested Replacement</span>
+                      <p className="text-emerald-300 font-semibold font-mono mt-0.5 text-[11px]">{c.suggested_text}</p>
                     </div>
 
-                    <p className="text-[11px] text-gray-600 italic">{c.explanation}</p>
+                    <p className="text-[11px] text-purple-300/70 italic">{c.explanation}</p>
 
-                    <div className="flex items-center justify-between border-t border-gray-200/60 pt-2">
-                      <span className="text-[10px] font-semibold">
-                        Status: <Badge variant={c.status === 'ACCEPTED' ? 'success' : c.status === 'REJECTED' ? 'destructive' : 'secondary'} className="text-[9px] py-0">{c.status}</Badge>
+                    <div className="flex items-center justify-between border-t border-purple-900/40 pt-2">
+                      <span className="text-[10px] font-semibold text-purple-200">
+                        Status:{' '}
+                        <Badge variant={c.status === 'ACCEPTED' ? 'success' : c.status === 'REJECTED' ? 'destructive' : 'secondary'} className="text-[9px] py-0">
+                          {c.status}
+                        </Badge>
                       </span>
 
                       {c.status === 'PENDING' && (
@@ -517,7 +524,7 @@ export default function ReviewDetailPage() {
                             variant="outline"
                             onClick={() => handleCorrectionDecision(c.id, false)}
                             isLoading={actionLoading === c.id}
-                            className="h-6 text-[10px] px-2 text-red-600 hover:bg-red-50"
+                            className="h-6 text-[10px] px-2 text-red-400 border-red-500/40 hover:bg-red-500/10"
                           >
                             Reject
                           </Button>
@@ -525,7 +532,7 @@ export default function ReviewDetailPage() {
                             size="sm"
                             onClick={() => handleCorrectionDecision(c.id, true)}
                             isLoading={actionLoading === c.id}
-                            className="h-6 text-[10px] px-2 bg-emerald-600 hover:bg-emerald-700"
+                            className="h-6 text-[10px] px-2 font-bold"
                           >
                             Accept
                           </Button>
@@ -535,7 +542,7 @@ export default function ReviewDetailPage() {
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-gray-500 italic text-center py-4">
+                <p className="text-xs text-purple-300/60 italic text-center py-4">
                   No automated corrections required.
                 </p>
               )}
@@ -545,12 +552,12 @@ export default function ReviewDetailPage() {
           {/* Submitted Raw Content Viewer */}
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-semibold uppercase text-gray-500">
+              <CardTitle className="text-xs font-semibold uppercase text-purple-300/80">
                 Submitted Content Payload
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="max-h-64 overflow-y-auto rounded bg-gray-900 p-3 font-mono text-xs text-gray-100 whitespace-pre-wrap leading-relaxed">
+              <div className="max-h-64 overflow-y-auto rounded-xl bg-purple-950/70 border border-purple-900/50 p-3 font-mono text-xs text-purple-100 whitespace-pre-wrap leading-relaxed">
                 {content.raw_text || '[Document/Image payload parsed into canonical blocks]'}
               </div>
             </CardContent>
@@ -563,11 +570,11 @@ export default function ReviewDetailPage() {
         open={decisionModalOpen}
         onClose={() => setDecisionModalOpen(false)}
         title="Record Governance Decision"
-        description="Your decision will be recorded in the immutable audit trail along with hash provenance."
+        description="Your decision will be recorded in the immutable audit trail along with SHA-256 hash provenance."
       >
         <div className="space-y-4 pt-2">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-purple-200 mb-1">
               Decision Option
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -577,10 +584,10 @@ export default function ReviewDetailPage() {
                   type="button"
                   onClick={() => setSelectedDecision(d)}
                   className={[
-                    'rounded-lg border p-2.5 text-center text-xs font-semibold transition',
+                    'rounded-xl border p-2.5 text-center text-xs font-bold transition',
                     selectedDecision === d
-                      ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                      : 'border-gray-200 hover:bg-gray-50 text-gray-700',
+                      ? 'border-amber-400 bg-amber-500/20 text-white shadow-gold-sm'
+                      : 'border-purple-800/60 bg-purple-950/40 text-purple-300 hover:bg-purple-900/50',
                   ].join(' ')}
                 >
                   {d.replace(/_/g, ' ')}
@@ -590,39 +597,39 @@ export default function ReviewDetailPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-purple-200 mb-1">
               Reviewer Rationale & Audit Comments
             </label>
             <Textarea
               value={decisionReason}
               onChange={(e) => setDecisionReason(e.target.value)}
-              placeholder="State the justification for this decision..."
+              placeholder="State the justification for this governance decision..."
               rows={3}
             />
           </div>
 
           {selectedDecision === 'APPROVE' && hasCriticalBlocker && (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-900 space-y-2">
-              <p className="font-semibold flex items-center gap-1.5 text-red-800">
-                <AlertTriangle className="h-4 w-4 shrink-0" />
+            <div className="rounded-xl border border-red-500/40 bg-red-950/50 p-3 text-xs text-red-200 space-y-2">
+              <p className="font-bold flex items-center gap-1.5 text-red-300">
+                <AlertTriangle className="h-4 w-4 shrink-0 text-red-400" />
                 Critical Finding Override Required
               </p>
-              <p>
-                There are {criticalFindings.length} unresolved critical findings. To approve anyway, you must check the box below and provide a clear rationale.
+              <p className="text-[11px] leading-relaxed">
+                There are {criticalFindings.length} unresolved critical findings. To approve anyway, you must verify the box below and provide written rationale.
               </p>
-              <label className="flex items-center gap-2 cursor-pointer font-medium mt-1">
+              <label className="flex items-center gap-2 cursor-pointer font-medium mt-1 text-xs">
                 <input
                   type="checkbox"
                   checked={overrideCritical}
                   onChange={(e) => setOverrideCritical(e.target.checked)}
-                  className="rounded text-indigo-600 focus:ring-indigo-500"
+                  className="rounded text-amber-500 focus:ring-amber-400"
                 />
                 Override Critical Finding(s) with Auditor Responsibility
               </label>
             </div>
           )}
 
-          <div className="flex justify-end gap-2 pt-4 border-t border-gray-100">
+          <div className="flex justify-end gap-2 pt-4 border-t border-purple-900/30">
             <Button
               variant="outline"
               onClick={() => setDecisionModalOpen(false)}
@@ -632,7 +639,7 @@ export default function ReviewDetailPage() {
             <Button
               onClick={handleDecisionSubmit}
               isLoading={decisionSubmitting}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              className="font-bold shadow-gold-sm"
             >
               Commit Decision
             </Button>
@@ -649,7 +656,7 @@ export default function ReviewDetailPage() {
       >
         <div className="space-y-4 pt-2">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-purple-200 mb-1">
               Edited Content Copy
             </label>
             <Textarea
@@ -660,7 +667,7 @@ export default function ReviewDetailPage() {
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-4 border-t border-gray-100">
+          <div className="flex justify-end gap-2 pt-4 border-t border-purple-900/30">
             <Button
               variant="outline"
               onClick={() => setRerunModalOpen(false)}
@@ -670,7 +677,7 @@ export default function ReviewDetailPage() {
             <Button
               onClick={handleRerun}
               isLoading={rerunSubmitting}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              className="font-bold shadow-gold-sm"
             >
               Dispatch Re-run
             </Button>

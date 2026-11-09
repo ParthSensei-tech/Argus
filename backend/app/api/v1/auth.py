@@ -9,6 +9,7 @@ from app.core.security import create_access_token, hash_password, verify_passwor
 from app.models.identity import Organisation, OrganisationMember, User
 from app.schemas.auth import (
     CreateOrgIn,
+    DemoLoginIn,
     LoginIn,
     MeOut,
     MembershipOut,
@@ -20,6 +21,52 @@ from app.schemas.auth import (
 from app.schemas.enums import Role
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+DEMO_ACCOUNTS = {
+    "admin": ("admin@argus.demo", "Alex Admin", Role.ADMIN.value),
+    "reviewer": ("reviewer@argus.demo", "Riley Reviewer", Role.REVIEWER.value),
+    "editor": ("editor@argus.demo", "Sam Editor", Role.EDITOR.value),
+}
+
+
+def _ensure_demo_user(db: Session, key: str) -> User:
+    email, full_name, role_val = DEMO_ACCOUNTS.get(key, DEMO_ACCOUNTS["admin"])
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        user = User(
+            email=email,
+            full_name=full_name,
+            password_hash=hash_password("Demo1234!"),
+            is_active=True,
+        )
+        db.add(user)
+        db.flush()
+    else:
+        # Guarantee active status and password
+        user.is_active = True
+        user.password_hash = hash_password("Demo1234!")
+        db.flush()
+
+    # Ensure Nexus Technologies org exists
+    org = db.query(Organisation).filter(Organisation.slug == "nexus-technologies").first()
+    if not org:
+        org = Organisation(name="Nexus Technologies", slug="nexus-technologies")
+        db.add(org)
+        db.flush()
+
+    membership = (
+        db.query(OrganisationMember)
+        .filter(OrganisationMember.org_id == org.id, OrganisationMember.user_id == user.id)
+        .first()
+    )
+    if not membership:
+        db.add(OrganisationMember(org_id=org.id, user_id=user.id, role=role_val))
+    else:
+        membership.role = role_val
+
+    db.commit()
+    db.refresh(user)
+    return user
 
 
 @router.post("/register", response_model=TokenOut, status_code=201)
@@ -38,9 +85,26 @@ def register(body: RegisterIn, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=TokenOut)
 def login(body: LoginIn, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == body.email.lower()).first()
+    email_clean = body.email.lower().strip()
+    
+    # Check if this is a demo account with the official demo password
+    for key, (demo_email, _, _) in DEMO_ACCOUNTS.items():
+        if email_clean == demo_email and body.password == "Demo1234!":
+            user = _ensure_demo_user(db, key)
+            return TokenOut(access_token=create_access_token(str(user.id)))
+
+    user = db.query(User).filter(User.email == email_clean).first()
     if not user or not verify_password(body.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password")
+    return TokenOut(access_token=create_access_token(str(user.id)))
+
+
+@router.post("/demo-login", response_model=TokenOut)
+def demo_login(body: DemoLoginIn, db: Session = Depends(get_db)):
+    role_key = body.role.lower().strip()
+    if role_key not in DEMO_ACCOUNTS:
+        role_key = "admin"
+    user = _ensure_demo_user(db, role_key)
     return TokenOut(access_token=create_access_token(str(user.id)))
 
 

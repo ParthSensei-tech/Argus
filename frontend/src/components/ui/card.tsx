@@ -8,7 +8,7 @@ export function Card({ className = '', children, ...props }: CardProps) {
   return (
     <div
       className={[
-        'rounded-xl border border-gray-200 bg-white shadow-sm',
+        'rounded-xl border border-purple-900/40 bg-[#140B26]/85 backdrop-blur-md text-white shadow-xl shadow-purple-950/30 transition-all duration-200',
         className,
       ].join(' ')}
       {...props}
@@ -40,7 +40,7 @@ interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
 export function CardTitle({ className = '', children, ...props }: CardTitleProps) {
   return (
     <h3
-      className={['text-lg font-semibold leading-none tracking-tight text-gray-900', className].join(
+      className={['text-lg font-bold leading-none tracking-tight text-white', className].join(
         ' '
       )}
       {...props}
@@ -52,7 +52,8 @@ export function CardTitle({ className = '', children, ...props }: CardTitleProps
 
 // ─── CardDescription ──────────────────────────────────────────────────────────
 
-interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+interface CardDescriptionProps
+  extends React.HTMLAttributes<HTMLParagraphElement> {}
 
 export function CardDescription({
   className = '',
@@ -60,10 +61,7 @@ export function CardDescription({
   ...props
 }: CardDescriptionProps) {
   return (
-    <p
-      className={['text-sm text-gray-500', className].join(' ')}
-      {...props}
-    >
+    <p className={['text-xs text-purple-200/70', className].join(' ')} {...props}>
       {children}
     </p>
   );
@@ -88,7 +86,7 @@ interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
 export function CardFooter({ className = '', children, ...props }: CardFooterProps) {
   return (
     <div
-      className={['flex items-center p-6 pt-0', className].join(' ')}
+      className={['flex items-center p-6 pt-0 border-t border-purple-900/30 bg-purple-950/20', className].join(' ')}
       {...props}
     >
       {children}
