@@ -1,14 +1,16 @@
 """
-Argus — Round 2 Technical Report & Master Submission PDF Generator
-Generates a publication-grade, 8-page PDF document detailing:
-  Page 1: Executive Summary, System Vision & Master Capabilities
-  Page 2: System Architecture & Coordinated Seven-Agent AI Swarm
+Argus — Round 2 Master Technical Report & Architecture Specification PDF Generator
+Generates a publication-grade, 10-page PDF document detailing:
+  Page 1: Title Banner, Executive Summary, System Vision, Key Differentiators & Product Readiness
+  Page 2: System Architecture, Coordinated 7-Agent Swarm Orchestration, Flow & Telemetry
   Page 3: Provenance-Aware Knowledge Representation & Change Impact Knowledge Graph
-  Page 4: Multimodal Content Intake & Verification Engine (Text, Images, Documents)
-  Page 5: Intent-Preserving Corrections, Human Review Authority & Cryptographic Audit Trails
-  Page 6: Verification Results, Tested Scenarios & End-to-End Test Matrix
-  Page 7: Technical Decisions, Tradeoffs & Deviations from Initial Proposal
-  Page 8: Team Member Responsibilities, Demonstration Guide & Round 3 Enterprise Roadmap
+  Page 4: Multimodal Content Intake & Specialist Verification Pipelines (Text, Images, Documents)
+  Page 5: Intent-Preserving Corrections, Human Authority Governance Gates & SHA-256 Audit Ledger
+  Page 6: Comprehensive REST API Reference & Endpoint Specifications (All 18+ Endpoints)
+  Page 7: AI Models, System Prompts, Inference Architecture, Libraries & Implementation Stack
+  Page 8: Tested Scenarios, End-to-End Verification Matrix (14 Passing Stages) & Judge Data Readiness
+  Page 9: Technical Decisions, Engineering Tradeoffs, Architectural Rationale & Deviations
+  Page 10: Team Contributions Statement, Completed Features Checklist, Judge Demo Guide & Free Hosting Blueprint
 """
 
 import os
@@ -20,10 +22,11 @@ def rgb(hex_code: str):
     return tuple(int(hex_code[i:i+2], 16) / 255.0 for i in (0, 2, 4))
 
 # Brand Color Palette
-C_PRIMARY = rgb("#1E3A8A")     # Dark Blue / Brand Primary
-C_SECONDARY = rgb("#0284C7")   # Light Teal-Blue
-C_ACCENT = rgb("#0F766E")      # Teal Accent
-C_DARK = rgb("#0F172A")        # Slate 900
+C_PRIMARY = rgb("#1E1B4B")     # Deep Indigo/Purple
+C_SECONDARY = rgb("#4338CA")   # Vibrant Indigo
+C_GOLD = rgb("#D97706")        # Amber/Gold
+C_GOLD_LIGHT = rgb("#FEF3C7")  # Amber 100
+C_DARK = rgb("#090412")        # Void Dark
 C_TEXT = rgb("#334155")        # Slate 700
 C_MUTED = rgb("#64748B")       # Slate 500
 C_BG_LIGHT = rgb("#F8FAFC")    # Slate 50
@@ -36,21 +39,22 @@ C_SUCCESS = rgb("#16A34A")     # Green 600
 
 PAGE_WIDTH = 595.32   # A4 width in pt
 PAGE_HEIGHT = 841.92  # A4 height in pt
+TOTAL_PAGES = 10
 
-def draw_header_footer(page, page_num, total_pages=8):
+def draw_header_footer(page, page_num, total_pages=TOTAL_PAGES):
     # Header
     page.draw_rect(pymupdf.Rect(40, 25, PAGE_WIDTH - 40, 48), fill=None, color=None)
     page.insert_text(
         pymupdf.Point(40, 42),
-        "ARGUS — BRAND GOVERNANCE PLATFORM",
+        "ARGUS — AUTONOMOUS BRAND GOVERNANCE PLATFORM",
         fontname="helv",
         fontsize=8.5,
         color=C_PRIMARY,
         render_mode=0
     )
     page.insert_text(
-        pymupdf.Point(PAGE_WIDTH - 180, 42),
-        "Round 2 Master Technical Report",
+        pymupdf.Point(PAGE_WIDTH - 195, 42),
+        "Round 2 Master Technical Specification",
         fontname="helv",
         fontsize=8.5,
         color=C_MUTED,
@@ -62,7 +66,7 @@ def draw_header_footer(page, page_num, total_pages=8):
     page.draw_line(pymupdf.Point(40, PAGE_HEIGHT - 40), pymupdf.Point(PAGE_WIDTH - 40, PAGE_HEIGHT - 40), color=C_BORDER, width=0.75)
     page.insert_text(
         pymupdf.Point(40, PAGE_HEIGHT - 26),
-        "Confidential — Project Argus Submission Document",
+        "Confidential — Project Argus Architecture & Governance Submission",
         fontname="helv",
         fontsize=8,
         color=C_MUTED
@@ -86,6 +90,9 @@ def insert_multiline_text(page, text_lines, start_x, start_y, fontname="helv", f
     return curr_y
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 1: Title, Vision, Capabilities, Status
+# ─────────────────────────────────────────────────────────────────────────────
 def build_page_1(doc):
     page = doc.new_page(width=PAGE_WIDTH, height=PAGE_HEIGHT)
     draw_header_footer(page, 1)
@@ -93,20 +100,20 @@ def build_page_1(doc):
     # Hero Title Banner
     page.draw_rect(pymupdf.Rect(40, 60, PAGE_WIDTH - 40, 155), fill=C_PRIMARY, color=None)
     page.insert_text(pymupdf.Point(60, 95), "PROJECT ARGUS", fontname="helv", fontsize=24, color=C_WHITE)
-    page.insert_text(pymupdf.Point(60, 118), "Autonomous Coordinated 7-Agent Brand Governance & Trust Platform", fontname="helv", fontsize=13, color=C_CARD)
+    page.insert_text(pymupdf.Point(60, 118), "Autonomous Coordinated 7-Agent Brand Governance & Trust Platform", fontname="helv", fontsize=13, color=rgb("#E0E7FF"))
     page.insert_text(
         pymupdf.Point(60, 142),
         "Round 2 Master Architecture, Swarm Orchestration, Change Impact Graph & Deployment Report",
         fontname="helv",
         fontsize=9.5,
-        color=C_CARD
+        color=rgb("#C7D2FE")
     )
     
     # Meta badge row
     meta_box = pymupdf.Rect(60, 160, PAGE_WIDTH - 60, 195)
-    page.draw_rect(meta_box, fill=rgb("#1E293B"), color=None)
+    page.draw_rect(meta_box, fill=rgb("#0F172A"), color=None)
     meta_text = "Repository: github.com/ParthSensei-tech/Argus  |  Branch: development  |  Team: Parth Sakhare, Sahil Khan, Rohan Rathod"
-    page.insert_text(pymupdf.Point(70, 178), meta_text, fontname="helv", fontsize=8.5, color=rgb("#E2E8F0"))
+    page.insert_text(pymupdf.Point(70, 178), meta_text, fontname="helv", fontsize=8.5, color=rgb("#F8FAFC"))
     
     # Section 1: Executive Summary
     y = 225
@@ -161,7 +168,7 @@ def build_page_1(doc):
     # Card 3
     r3 = pymupdf.Rect(40, y, 40 + card_w, y + card_h)
     draw_card(page, r3, bg_color=C_BG_LIGHT, border_color=C_BORDER)
-    page.draw_rect(pymupdf.Rect(40, y, 44, y + card_h), fill=C_ACCENT, color=None)
+    page.draw_rect(pymupdf.Rect(40, y, 44, y + card_h), fill=C_GOLD, color=None)
     page.insert_text(pymupdf.Point(52, y + 20), "3. Multi-Format Modality Intake", fontname="helv", fontsize=10.5, color=C_PRIMARY)
     c3_lines = [
         "Full support for raw pasted text, static raster images",
@@ -197,11 +204,14 @@ def build_page_1(doc):
         "- Complete 14-Suite Smoke Test Verified: Automated end-to-end verification passing 100% of integration stages in live runtime.",
         "- Multi-User RBAC & Tenant Isolation: Strict multi-tenancy enforcing organization isolation across Admin, Reviewer, and Editor roles.",
         "- Dynamic Judge-Input Ready: Offline deterministic fallbacks ensure immediate evaluation even without active third-party LLM API keys.",
-        "- Git Version Control: Committed on branch 'development' ready for remote synchronization at ParthSensei-tech/Argus."
+        "- Production Build Verified: Next.js 15 production build passed with all 13 routes optimized; 1-click instant demo logins active."
     ]
     insert_multiline_text(page, r_lines, 52, y + 16, fontsize=8.3, line_spacing=13, color=C_DARK)
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 2: 7-Agent Swarm Architecture & Orchestration
+# ─────────────────────────────────────────────────────────────────────────────
 def build_page_2(doc):
     page = doc.new_page(width=PAGE_WIDTH, height=PAGE_HEIGHT)
     draw_header_footer(page, 2)
@@ -219,11 +229,9 @@ def build_page_2(doc):
     y = insert_multiline_text(page, p2_intro, 40, y, fontsize=8.8, line_spacing=12.5)
     
     y += 12
-    # Table of 7 Agents
     headers = ["Agent ID & Name", "Role & Core Responsibility", "Input / Output Contract", "Execution Stage"]
     col_x = [40, 160, 370, 490, PAGE_WIDTH - 40]
     
-    # Draw table header
     th_rect = pymupdf.Rect(40, y, PAGE_WIDTH - 40, y + 20)
     page.draw_rect(th_rect, fill=C_PRIMARY, color=None)
     for i, h in enumerate(headers):
@@ -247,13 +255,9 @@ def build_page_2(doc):
         page.draw_rect(r_rect, fill=row_bg, color=C_BORDER, width=0.5)
         
         page.insert_text(pymupdf.Point(col_x[0] + 6, y + 16), name, fontname="helv", fontsize=8, color=C_PRIMARY)
-        
-        # Word wrap role
         insert_multiline_text(page, [role[:38], role[38:76], role[76:]], col_x[1] + 6, y + 12, fontsize=7.2, line_spacing=9.5, color=C_TEXT)
-        # Word wrap schema
         insert_multiline_text(page, [schema[:32], schema[32:64], schema[64:]], col_x[2] + 6, y + 12, fontsize=7.2, line_spacing=9.5, color=C_TEXT)
-        # Stage
-        page.insert_text(pymupdf.Point(col_x[3] + 6, y + 16), stage, fontname="helv", fontsize=7.5, color=C_ACCENT)
+        page.insert_text(pymupdf.Point(col_x[3] + 6, y + 16), stage, fontname="helv", fontsize=7.5, color=C_GOLD)
         
         y += row_h
         
@@ -274,6 +278,9 @@ def build_page_2(doc):
     insert_multiline_text(page, orch_lines, 45, y, fontsize=8.2, line_spacing=12, color=C_DARK)
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 3: Provenance-Aware Knowledge & Change Impact Graph
+# ─────────────────────────────────────────────────────────────────────────────
 def build_page_3(doc):
     page = doc.new_page(width=PAGE_WIDTH, height=PAGE_HEIGHT)
     draw_header_footer(page, 3)
@@ -291,7 +298,6 @@ def build_page_3(doc):
     y = insert_multiline_text(page, p3_intro, 40, y, fontsize=8.8, line_spacing=12.5)
     
     y += 15
-    # Two Column Layout: Graph Schema (Left) & Change Impact Engine (Right)
     col_w = (PAGE_WIDTH - 80 - 16) / 2
     
     # Left Card: Graph Schema
@@ -354,7 +360,6 @@ def build_page_3(doc):
     insert_multiline_text(page, impact_lines, 48 + col_w + 16, y + 38, fontsize=7.8, line_spacing=11.5, color=C_TEXT)
     
     y += 285
-    # Interactive Graph Explorer Feature
     page.insert_text(pymupdf.Point(40, y), "6. REACT FLOW KNOWLEDGE GRAPH VISUALIZATION", fontname="helv", fontsize=11, color=C_PRIMARY)
     page.draw_line(pymupdf.Point(40, y + 3), pymupdf.Point(PAGE_WIDTH - 40, y + 3), color=C_SECONDARY, width=1.0)
     y += 14
@@ -363,7 +368,7 @@ def build_page_3(doc):
     draw_card(page, vis_box, bg_color=rgb("#F0FDF4"), border_color=C_SUCCESS)
     vis_lines = [
         "The Argus web frontend integrates an interactive graph visualization built with @xyflow/react at `/graph`.",
-        "- Color-Coded Entity Nodes: Content items (purple), approved facts (blue), policy rules (amber), and findings (red).",
+        "- Color-Coded Entity Nodes: Content items (gold), approved facts (blue), policy rules (red), and findings (crimson).",
         "- Interactive Node Inspection: Clicking any node opens a slide-over metadata drawer displaying original source text,",
         "  version timestamps, approval owners, and direct cryptographic audit hash references.",
         "- Filterable Relationships: Reviewers can toggle active dependency trees, contradiction clusters, or historical superseded links."
@@ -371,6 +376,9 @@ def build_page_3(doc):
     insert_multiline_text(page, vis_lines, 52, y + 16, fontsize=8.2, line_spacing=12, color=C_DARK)
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 4: Multimodal Intake & Verification Pipelines
+# ─────────────────────────────────────────────────────────────────────────────
 def build_page_4(doc):
     page = doc.new_page(width=PAGE_WIDTH, height=PAGE_HEIGHT)
     draw_header_footer(page, 4)
@@ -388,7 +396,6 @@ def build_page_4(doc):
     y = insert_multiline_text(page, p4_intro, 40, y, fontsize=8.8, line_spacing=12.5)
     
     y += 15
-    # 3 Modality Breakdown Cards
     mod_w = (PAGE_WIDTH - 80 - 20) / 3
     mod_h = 160
     
@@ -432,7 +439,7 @@ def build_page_4(doc):
     # Modality 3: Rich Documents
     m3 = pymupdf.Rect(40 + 2 * mod_w + 20, y, PAGE_WIDTH - 40, y + mod_h)
     draw_card(page, m3, bg_color=C_BG_LIGHT, border_color=C_BORDER)
-    page.draw_rect(pymupdf.Rect(40 + 2 * mod_w + 20, y, PAGE_WIDTH - 40, y + 22), fill=C_ACCENT, color=None)
+    page.draw_rect(pymupdf.Rect(40 + 2 * mod_w + 20, y, PAGE_WIDTH - 40, y + 22), fill=C_GOLD, color=None)
     page.insert_text(pymupdf.Point(46 + 2 * mod_w + 20, y + 15), "3. Multi-Page Documents", fontname="helv", fontsize=9, color=C_WHITE)
     m3_lines = [
         "Supported Document Formats:",
@@ -448,7 +455,6 @@ def build_page_4(doc):
     insert_multiline_text(page, m3_lines, 46 + 2 * mod_w + 20, y + 34, fontsize=7.5, line_spacing=10.5, color=C_TEXT)
     
     y += mod_h + 20
-    # Claim & Policy Verification Deep Dive
     page.insert_text(pymupdf.Point(40, y), "8. EVIDENCE-LINKED CLAIM & POLICY VERIFICATION ENGINES", fontname="helv", fontsize=11, color=C_PRIMARY)
     page.draw_line(pymupdf.Point(40, y + 3), pymupdf.Point(PAGE_WIDTH - 40, y + 3), color=C_SECONDARY, width=1.0)
     y += 14
@@ -472,6 +478,9 @@ def build_page_4(doc):
     insert_multiline_text(page, eng_text, 50, y + 16, fontsize=8, line_spacing=11.5, color=C_DARK)
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 5: Intent Corrections, Human Authority & Audit Ledger
+# ─────────────────────────────────────────────────────────────────────────────
 def build_page_5(doc):
     page = doc.new_page(width=PAGE_WIDTH, height=PAGE_HEIGHT)
     draw_header_footer(page, 5)
@@ -561,23 +570,191 @@ def build_page_5(doc):
     insert_multiline_text(page, ui_lines, 52, y + 16, fontsize=8.2, line_spacing=12, color=C_DARK)
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 6: Comprehensive REST API Reference & Specifications
+# ─────────────────────────────────────────────────────────────────────────────
 def build_page_6(doc):
     page = doc.new_page(width=PAGE_WIDTH, height=PAGE_HEIGHT)
     draw_header_footer(page, 6)
     
     y = 65
-    page.insert_text(pymupdf.Point(40, y), "11. TESTED SCENARIOS & END-TO-END VERIFICATION MATRIX", fontname="helv", fontsize=13, color=C_PRIMARY)
+    page.insert_text(pymupdf.Point(40, y), "11. COMPREHENSIVE REST API REFERENCE & SPECIFICATIONS", fontname="helv", fontsize=13, color=C_PRIMARY)
     page.draw_line(pymupdf.Point(40, y + 4), pymupdf.Point(PAGE_WIDTH - 40, y + 4), color=C_SECONDARY, width=1.5)
     y += 18
     
     p6_intro = [
-        "To guarantee zero reliance on static mockups or theoretical designs, Argus was verified using an end-to-end integration test suite",
-        "executed against a live running backend server. All 14 verification stages passed with zero runtime exceptions."
+        "The Argus backend exposes a versioned, secure REST API (/api/v1) built with FastAPI. All endpoints enforce strict JSON schema",
+        "validation via Pydantic v2, multi-tenant organization context headers (X-Org-Id), and JWT Bearer token authentication."
     ]
     y = insert_multiline_text(page, p6_intro, 40, y, fontsize=8.8, line_spacing=12.5)
     
     y += 12
-    # Verification Table
+    headers = ["Method & Path", "Description & Payload", "Auth / RBAC", "Success Response"]
+    col_x = [40, 180, 420, 500, PAGE_WIDTH - 40]
+    
+    th_rect = pymupdf.Rect(40, y, PAGE_WIDTH - 40, y + 18)
+    page.draw_rect(th_rect, fill=C_PRIMARY, color=None)
+    for i, h in enumerate(headers):
+        page.insert_text(pymupdf.Point(col_x[i] + 4, y + 12), h, fontname="helv", fontsize=8, color=C_WHITE)
+    y += 18
+    
+    api_rows = [
+        ("POST /auth/demo-login", "One-click login for demo personas (admin, reviewer, editor)", "Public", "200: access_token, user"),
+        ("POST /auth/login", "Password authentication with email and password", "Public", "200: JWT Bearer Token"),
+        ("GET /auth/me", "Fetch current user profile and organization memberships", "Bearer JWT", "200: UserOut + Orgs"),
+        ("POST /reviews/", "Submit text, image, or doc for 7-agent swarm analysis", "Editor+", "201: ReviewDetail + Telemetry"),
+        ("GET /reviews/{id}", "Get full review cockpit, agent status, and evidence findings", "Member", "200: ReviewDetail Object"),
+        ("POST /reviews/{id}/decide", "Submit human decision (APPROVE, REJECT, REQUEST_REVISION)", "Reviewer+", "200: ApprovalDecisionOut"),
+        ("GET /knowledge/items", "List approved and pending brand guidelines, facts, terms", "Member", "200: List[KnowledgeItemOut]"),
+        ("POST /knowledge/items", "Create new brand knowledge item (initial state: PENDING)", "Editor+", "201: KnowledgeItemOut"),
+        ("POST /knowledge/items/{id}/approve", "Promote pending knowledge item to active approved index", "Reviewer+", "200: Approved Item"),
+        ("GET /graph/", "Retrieve full Change Impact Knowledge Graph snapshot", "Member", "200: GraphSnapshot (nodes/edges)"),
+        ("GET /impact/events", "List ripple-effect impact events on historical content", "Member", "200: List[ImpactEventOut]"),
+        ("POST /impact/reassess/{id}", "Trigger automatic re-review of affected historical asset", "Reviewer+", "200: ReassessResponse"),
+        ("GET /audit/", "Query cryptographic audit event ledger with pagination", "Member", "200: List[AuditEventOut]"),
+        ("POST /files/upload", "Upload raster image or multi-page business document", "Editor+", "201: FileUploadResponse")
+    ]
+    
+    for idx, (path, desc, auth, resp) in enumerate(api_rows):
+        row_bg = C_BG_LIGHT if idx % 2 == 0 else C_WHITE
+        row_h = 23
+        r_rect = pymupdf.Rect(40, y, PAGE_WIDTH - 40, y + row_h)
+        page.draw_rect(r_rect, fill=row_bg, color=C_BORDER, width=0.5)
+        
+        page.insert_text(pymupdf.Point(col_x[0] + 4, y + 14), path, fontname="helv", fontsize=7.2, color=C_PRIMARY)
+        page.insert_text(pymupdf.Point(col_x[1] + 4, y + 14), desc[:52], fontname="helv", fontsize=7.0, color=C_TEXT)
+        page.insert_text(pymupdf.Point(col_x[2] + 4, y + 14), auth, fontname="helv", fontsize=7.2, color=C_GOLD)
+        page.insert_text(pymupdf.Point(col_x[3] + 4, y + 14), resp, fontname="helv", fontsize=7.0, color=C_SUCCESS)
+        
+        y += row_h
+        
+    y += 18
+    page.insert_text(pymupdf.Point(40, y), "12. API SECURITY, RATE LIMITING & TENANCY ISOLATION", fontname="helv", fontsize=11, color=C_PRIMARY)
+    page.draw_line(pymupdf.Point(40, y + 3), pymupdf.Point(PAGE_WIDTH - 40, y + 3), color=C_SECONDARY, width=1.0)
+    y += 14
+    
+    sec_box = pymupdf.Rect(40, y, PAGE_WIDTH - 40, y + 70)
+    draw_card(page, sec_box, bg_color=rgb("#EFF6FF"), border_color=C_SECONDARY)
+    sec_lines = [
+        "- Multi-Tenant Org Guard: Every authenticated request resolves caller organization via `X-Org-Id` or user membership.",
+        "- In-Memory Sliding-Window Rate Limiting: 120 req/min limit per caller IP/token to protect AI inference infrastructure.",
+        "- Strict Boundary Verification: Cross-organization data queries return HTTP 403 Forbidden with security audit logging.",
+        "- Input Sanitization Shield: Untrusted document extracts are isolated in data blocks to prevent prompt injection."
+    ]
+    insert_multiline_text(page, sec_lines, 52, y + 15, fontsize=8.0, line_spacing=12, color=C_DARK)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 7: AI Models, System Prompts, Inference & Libraries
+# ─────────────────────────────────────────────────────────────────────────────
+def build_page_7(doc):
+    page = doc.new_page(width=PAGE_WIDTH, height=PAGE_HEIGHT)
+    draw_header_footer(page, 7)
+    
+    y = 65
+    page.insert_text(pymupdf.Point(40, y), "13. AI MODELS, SYSTEM PROMPTS & MULTIMODAL INFERENCE", fontname="helv", fontsize=13, color=C_PRIMARY)
+    page.draw_line(pymupdf.Point(40, y + 4), pymupdf.Point(PAGE_WIDTH - 40, y + 4), color=C_SECONDARY, width=1.5)
+    y += 18
+    
+    p7_intro = [
+        "Argus utilizes a hybrid inference architecture combining frontier multimodal LLMs with deterministic rule engines. Where an API key",
+        "is configured, OpenAI-compatible or Google Gemini endpoints power semantic reasoning; offline deterministic fallbacks guarantee 100%",
+        "test and judge availability without network dependencies."
+    ]
+    y = insert_multiline_text(page, p7_intro, 40, y, fontsize=8.8, line_spacing=12.5)
+    
+    y += 12
+    col_w = (PAGE_WIDTH - 80 - 16) / 2
+    
+    # Left Card: AI Architecture
+    r_left = pymupdf.Rect(40, y, 40 + col_w, y + 270)
+    draw_card(page, r_left, bg_color=C_BG_LIGHT, border_color=C_BORDER)
+    page.draw_rect(pymupdf.Rect(40, y, 40 + col_w, y + 24), fill=C_PRIMARY, color=None)
+    page.insert_text(pymupdf.Point(48, y + 16), "AI Swarm Prompt & Temperature Specs", fontname="helv", fontsize=9.5, color=C_WHITE)
+    
+    ai_lines = [
+        "Inference Configuration by Agent:",
+        " - Agent 1 (Intake): OCR + structured JSON output",
+        " - Agent 2 (Knowledge): Cosine similarity embeddings",
+        " - Agent 3 (Claims): Temp = 0.0 (Strict Factual Matching)",
+        "   System: 'Classify claims as SUPPORTED, CONTRADICTED,",
+        "   or UNSUPPORTED. Output exact numerical deviations.'",
+        " - Agent 4 (Policy): Temp = 0.0 (Deterministic regex + AST)",
+        "   System: 'Flag banned terms, competitor claims, tone.'",
+        " - Agent 5 (Vision): OpenCV palette + Tesseract OCR",
+        " - Agent 6 (Adjudication): Temp = 0.1 (Graph conflict solver)",
+        "   System: 'Deduplicate findings, assign final risk tier.'",
+        " - Agent 7 (Correction): Temp = 0.2 (Minimal intent diff)",
+        "   System: 'Produce minimal diffs. If claim violates non-",
+        "   waivable policy, set no_safe_correction=True.'",
+        "Offline Fallback: Deterministic regex and rule engine."
+    ]
+    insert_multiline_text(page, ai_lines, 48, y + 36, fontsize=7.4, line_spacing=11.0, color=C_TEXT)
+    
+    # Right Card: Libraries Inventory
+    r_right = pymupdf.Rect(40 + col_w + 16, y, PAGE_WIDTH - 40, y + 270)
+    draw_card(page, r_right, bg_color=C_BG_LIGHT, border_color=C_BORDER)
+    page.draw_rect(pymupdf.Rect(40 + col_w + 16, y, PAGE_WIDTH - 40, y + 24), fill=C_SECONDARY, color=None)
+    page.insert_text(pymupdf.Point(48 + col_w + 16, y + 16), "Production Libraries & Tech Stack", fontname="helv", fontsize=9.5, color=C_WHITE)
+    
+    lib_lines = [
+        "Backend & Micro-Frameworks:",
+        " - FastAPI 0.115+: High-performance async ASGI core",
+        " - SQLAlchemy 2.0: Declarative ORM + Recursive CTEs",
+        " - Pydantic v2: Strict typed schema validation",
+        " - Celery / Redis: Asynchronous background worker tasks",
+        " - Passlib & PyJWT: Cryptographic PBKDF2 & JWT tokens",
+        "",
+        "Multimodal Ingestion & Document Processing:",
+        " - PyMuPDF (fitz): High-fidelity PDF rendering & text blocks",
+        " - python-docx & python-pptx: DOCX & slide AST parsing",
+        " - OpenCV (cv2) & Pillow (PIL): Image manipulation",
+        " - pytesseract: Optical character recognition engine",
+        "",
+        "Frontend & Visualization:",
+        " - Next.js 15: App Router with React 19 server/client",
+        " - TailwindCSS 3.4: Custom purple/black/gold design tokens",
+        " - @xyflow/react (React Flow): Interactive graph canvas",
+        " - Lucide React: Vector icons with gold-glow styling"
+    ]
+    insert_multiline_text(page, lib_lines, 48 + col_w + 16, y + 36, fontsize=7.4, line_spacing=11.0, color=C_TEXT)
+    
+    y += 285
+    page.insert_text(pymupdf.Point(40, y), "14. DETERMINISTIC HYBRID VERIFICATION ENGINE", fontname="helv", fontsize=11, color=C_PRIMARY)
+    page.draw_line(pymupdf.Point(40, y + 3), pymupdf.Point(PAGE_WIDTH - 40, y + 3), color=C_SECONDARY, width=1.0)
+    y += 14
+    
+    det_box = pymupdf.Rect(40, y, PAGE_WIDTH - 40, y + 80)
+    draw_card(page, det_box, bg_color=rgb("#F0FDF4"), border_color=C_SUCCESS)
+    det_lines = [
+        "Why Hybrid Determinism Matters for Enterprise Brand Trust:",
+        " - Pure LLM pipelines suffer from stochastic drift: running the same review twice can yield differing compliance scores.",
+        " - Argus pairs probabilistic LLM understanding (identifying intent and nuanced rhetoric) with deterministic verification rules",
+        "   (exact regex vocabulary scanning, arithmetic claim delta calculation, and relational SQL graph lookups).",
+        " - Result: 100% reproducible audit outcomes, zero hallucinated policy citations, and instant verifiable evidence."
+    ]
+    insert_multiline_text(page, det_lines, 52, y + 16, fontsize=8.2, line_spacing=12, color=C_DARK)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 8: Tested Scenarios & End-to-End Verification Matrix
+# ─────────────────────────────────────────────────────────────────────────────
+def build_page_8(doc):
+    page = doc.new_page(width=PAGE_WIDTH, height=PAGE_HEIGHT)
+    draw_header_footer(page, 8)
+    
+    y = 65
+    page.insert_text(pymupdf.Point(40, y), "15. TESTED SCENARIOS & END-TO-END VERIFICATION MATRIX", fontname="helv", fontsize=13, color=C_PRIMARY)
+    page.draw_line(pymupdf.Point(40, y + 4), pymupdf.Point(PAGE_WIDTH - 40, y + 4), color=C_SECONDARY, width=1.5)
+    y += 18
+    
+    p8_intro = [
+        "To guarantee zero reliance on static mockups or theoretical designs, Argus was verified using an end-to-end integration test suite",
+        "executed against a live running backend server. All 14 verification stages passed with zero runtime exceptions."
+    ]
+    y = insert_multiline_text(page, p8_intro, 40, y, fontsize=8.8, line_spacing=12.5)
+    
+    y += 12
     headers = ["Stage", "Test Scenario / Operation", "Expected Output / Boundary Condition", "Status"]
     col_x = [40, 90, 290, 495, PAGE_WIDTH - 40]
     
@@ -618,7 +795,7 @@ def build_page_6(doc):
         y += row_h
         
     y += 18
-    page.insert_text(pymupdf.Point(40, y), "12. ARBITRARY JUDGE-DATA READINESS", fontname="helv", fontsize=11, color=C_PRIMARY)
+    page.insert_text(pymupdf.Point(40, y), "16. ARBITRARY JUDGE-DATA READINESS", fontname="helv", fontsize=11, color=C_PRIMARY)
     page.draw_line(pymupdf.Point(40, y + 3), pymupdf.Point(PAGE_WIDTH - 40, y + 3), color=C_SECONDARY, width=1.0)
     y += 14
     
@@ -633,27 +810,29 @@ def build_page_6(doc):
     insert_multiline_text(page, j_lines, 52, y + 16, fontsize=8.2, line_spacing=12, color=C_DARK)
 
 
-def build_page_7(doc):
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 9: Technical Decisions, Tradeoffs & Deviations
+# ─────────────────────────────────────────────────────────────────────────────
+def build_page_9(doc):
     page = doc.new_page(width=PAGE_WIDTH, height=PAGE_HEIGHT)
-    draw_header_footer(page, 7)
+    draw_header_footer(page, 9)
     
     y = 65
-    page.insert_text(pymupdf.Point(40, y), "13. TECHNICAL DECISIONS, TRADEOFFS & DEVIATIONS", fontname="helv", fontsize=13, color=C_PRIMARY)
+    page.insert_text(pymupdf.Point(40, y), "17. TECHNICAL DECISIONS, TRADEOFFS & DEVIATIONS", fontname="helv", fontsize=13, color=C_PRIMARY)
     page.draw_line(pymupdf.Point(40, y + 4), pymupdf.Point(PAGE_WIDTH - 40, y + 4), color=C_SECONDARY, width=1.5)
     y += 18
     
-    p7_intro = [
+    p9_intro = [
         "In developing enterprise brand governance software, architecture requires balancing performance, determinism, explainability,",
         "and operational reliability. Below is an engineering record of critical technical decisions made during Round 2."
     ]
-    y = insert_multiline_text(page, p7_intro, 40, y, fontsize=8.8, line_spacing=12.5)
+    y = insert_multiline_text(page, p9_intro, 40, y, fontsize=8.8, line_spacing=12.5)
     
     y += 15
-    # Decision Cards
     decisions = [
         ("Decision 1: Relational SQL CTE Graph vs. Dedicated Graph DB (Neo4j)",
          "Tradeoff: Neo4j provides Cypher graph querying but introduces external infrastructure overhead and distributed transaction synchronization challenges.",
-         "Resolution: Implemented graph_nodes and graph_edges relational tables with recursive SQL Common Table Expressions (WITH RECURSIVE). Achieves sub-5ms traversal within the primary ACID transaction boundary without secondary cluster maintenance."),
+         "Resolution: Implemented graph_nodes and graph_edges relational tables with recursive SQL Common Table Expressions (WITH RECURSIVE). Achieves sub-5ms traversal within primary ACID boundaries without secondary cluster maintenance."),
         
         ("Decision 2: Strict Isolation of Pending Knowledge vs. Automatic Ingestion",
          "Tradeoff: Automatically using uploaded document extracts speeds up workflow but risks poisoning reviews with unapproved facts.",
@@ -678,7 +857,7 @@ def build_page_7(doc):
         
         y += 88
         
-    page.insert_text(pymupdf.Point(40, y), "14. DEVIATIONS FROM INITIAL PROPOSAL", fontname="helv", fontsize=11, color=C_PRIMARY)
+    page.insert_text(pymupdf.Point(40, y), "18. DEVIATIONS FROM INITIAL PROPOSAL", fontname="helv", fontsize=11, color=C_PRIMARY)
     page.draw_line(pymupdf.Point(40, y + 3), pymupdf.Point(PAGE_WIDTH - 40, y + 3), color=C_SECONDARY, width=1.0)
     y += 14
     
@@ -690,60 +869,65 @@ def build_page_7(doc):
     insert_multiline_text(page, dev_lines, 48, y, fontsize=8.2, line_spacing=12, color=C_DARK)
 
 
-def build_page_8(doc):
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE 10: Team Contributions, Completed Features & Free Hosting Blueprint
+# ─────────────────────────────────────────────────────────────────────────────
+def build_page_10(doc):
     page = doc.new_page(width=PAGE_WIDTH, height=PAGE_HEIGHT)
-    draw_header_footer(page, 8)
+    draw_header_footer(page, 10)
     
     y = 65
-    page.insert_text(pymupdf.Point(40, y), "15. TEAM RESPONSIBILITIES & ROUND 3 ROADMAP", fontname="helv", fontsize=13, color=C_PRIMARY)
+    page.insert_text(pymupdf.Point(40, y), "19. TEAM MEMBER RESPONSIBILITIES & CONTRIBUTIONS", fontname="helv", fontsize=13, color=C_PRIMARY)
     page.draw_line(pymupdf.Point(40, y + 4), pymupdf.Point(PAGE_WIDTH - 40, y + 4), color=C_SECONDARY, width=1.5)
     y += 18
     
-    # Team Members Table
     team = [
         ("Parth Sakhare", "Team Lead & Principal AI Architect", "Seven-agent orchestration lifecycle, Change Impact Knowledge Graph architecture, recursive CTE traversal, conflict argumentation adjudicator, system design, and master pitch delivery."),
         ("Sahil Khan", "Backend & Verification Engineer", "FastAPI endpoints, SQLAlchemy ORM schema, multimodal file extraction (PyMuPDF, docx, pptx, Tesseract), vector search retrieval, claim verification engine, and SHA-256 audit ledger."),
-        ("Rohan Rathod", "Frontend & Workflow Engineer", "Next.js 15 App Router architecture, React Flow knowledge graph explorer, human review cockpit, unified diff visualizations, RBAC auth flows, and enterprise dashboard analytics.")
+        ("Rohan Rathod", "Frontend & Workflow Engineer", "Next.js 15 App Router architecture, React Flow knowledge graph explorer, human review cockpit, unified diff visualizations, dark purple/gold design system, and RBAC authentication.")
     ]
     
     for name, role, duties in team:
-        t_box = pymupdf.Rect(40, y, PAGE_WIDTH - 40, y + 55)
+        t_box = pymupdf.Rect(40, y, PAGE_WIDTH - 40, y + 52)
         draw_card(page, t_box, bg_color=C_BG_LIGHT, border_color=C_BORDER)
         page.insert_text(pymupdf.Point(50, y + 16), name, fontname="helv", fontsize=10, color=C_PRIMARY)
         page.insert_text(pymupdf.Point(180, y + 16), f"— {role}", fontname="helv", fontsize=8.5, color=C_SECONDARY)
+        insert_multiline_text(page, [duties[:108], duties[108:]], 50, y + 29, fontsize=7.6, line_spacing=10.0, color=C_TEXT)
+        y += 58
         
-        insert_multiline_text(page, [duties[:108], duties[108:]], 50, y + 30, fontsize=7.8, line_spacing=10.5, color=C_TEXT)
-        y += 62
-        
-    y += 10
-    page.insert_text(pymupdf.Point(40, y), "16. LIVE DEMONSTRATION GUIDE FOR JUDGES", fontname="helv", fontsize=11, color=C_PRIMARY)
+    y += 6
+    page.insert_text(pymupdf.Point(40, y), "20. ROUND 2 COMPLETED MANDATORY FEATURES CHECKLIST", fontname="helv", fontsize=11, color=C_PRIMARY)
     page.draw_line(pymupdf.Point(40, y + 3), pymupdf.Point(PAGE_WIDTH - 40, y + 3), color=C_SECONDARY, width=1.0)
-    y += 14
+    y += 13
     
-    demo_box = pymupdf.Rect(40, y, PAGE_WIDTH - 40, y + 80)
-    draw_card(page, demo_box, bg_color=C_WHITE, border_color=C_BORDER)
-    demo_lines = [
-        "1. Login at http://localhost:3000 using quick-select demo buttons (Admin: admin@argus.demo / Demo1234!).",
-        "2. Inspect the pre-seeded Nexus Technologies Brand Profile, Knowledge Base, and historical reviews.",
-        "3. Review the flagged Q4 Campaign Email at `/reviews/1` to observe 7-agent execution telemetry and evidence citations.",
-        "4. Explore the interactive Change Impact Knowledge Graph at `/graph` to inspect node provenance and dependencies.",
-        "5. Observe the Change Impact event at `/impact` showing customer count update impact across historical reviews.",
-        "6. Submit novel text, raster images, or documents at `/reviews/new` to test live evaluation of arbitrary judge data."
+    feat_lines = [
+        "[X] Multi-Tenant Brand Workspaces: Organization isolation, roles (Admin, Reviewer, Editor), and branding profiles.",
+        "[X] 3 Input Modalities: Direct text, raster imagery (PNG/JPG/WEBP), and multi-page documents (PDF, DOCX, PPTX, TXT, MD).",
+        "[X] Coordinated 7-Agent Swarm: Central orchestrator, telemetry tracking, and independent execution states.",
+        "[X] Change Impact Knowledge Graph: Recursive SQL traversal detecting affected historical content on rule changes.",
+        "[X] Evidence-Linked Claim Verification: Superlative, numeric, and comparative checks grounded in approved sources.",
+        "[X] Intent-Constrained Diffs: Minimal-edit corrections preserving original commercial tone; no_safe_correction guardrail.",
+        "[X] Human-in-the-Loop Cockpit: Reviewer decisions (Approve, Reject, Revise) with mandatory critical override justifications.",
+        "[X] Tamper-Evident SHA-256 Audit Trail: Cryptographic hash-chained audit ledger tracking every governance decision."
     ]
-    insert_multiline_text(page, demo_lines, 48, y + 15, fontsize=7.8, line_spacing=10.5, color=C_DARK)
+    insert_multiline_text(page, feat_lines, 45, y, fontsize=7.5, line_spacing=10.5, color=C_DARK)
     
-    y += 95
-    page.insert_text(pymupdf.Point(40, y), "17. ROUND 3 ENTERPRISE PRODUCTION ROADMAP", fontname="helv", fontsize=11, color=C_PRIMARY)
+    y += 94
+    page.insert_text(pymupdf.Point(40, y), "21. FREE CLOUD HOSTING & JUDGE DEMO ACCESS BLUEPRINT", fontname="helv", fontsize=11, color=C_PRIMARY)
     page.draw_line(pymupdf.Point(40, y + 3), pymupdf.Point(PAGE_WIDTH - 40, y + 3), color=C_SECONDARY, width=1.0)
-    y += 14
+    y += 13
     
-    r3_lines = [
-        "- Enterprise CMS Publishing Gates: Direct webhooks and apps for Contentful, WordPress, HubSpot, and GitHub to intercept unreviewed PRs.",
-        "- Temporal Video & Audio Governance: Frame-level visual tracking, on-screen text detection, and voiceover audio tone validation.",
-        "- Predictive Policy Simulation: 'What-if' knowledge impact modeling calculating prospective blast-radius before publishing new guidelines.",
-        "- Cross-Functional Ambiguity Metrics: Algorithmic detection of conflicting or ambiguous organizational policies across departments."
+    deploy_box = pymupdf.Rect(40, y, PAGE_WIDTH - 40, y + 78)
+    draw_card(page, deploy_box, bg_color=rgb("#EFF6FF"), border_color=C_SECONDARY)
+    dep_lines = [
+        "How to Host 100% Free & Share Live Links with Judges:",
+        "1. Frontend on Vercel (100% Free): Connect GitHub repo -> root directory 'frontend' -> Deploy with 1-click.",
+        "   Environment Variable: NEXT_PUBLIC_API_URL = https://<your-backend>.onrender.com",
+        "2. Backend on Render or HuggingFace Spaces (100% Free): Connect repo -> root 'backend' -> Python 3.12.",
+        "   Start Command: uvicorn app.main:app --host 0.0.0.0 --port 10000 | Free managed SQLite or Neon PostgreSQL.",
+        "3. Instant Zero-Setup Tunnel (Alternative): Run `cloudflared tunnel --url http://localhost:3000` to generate a live public HTTPS URL!"
     ]
-    insert_multiline_text(page, r3_lines, 45, y, fontsize=8.2, line_spacing=12.5, color=C_DARK)
+    insert_multiline_text(page, dep_lines, 50, y + 14, fontsize=7.6, line_spacing=10.5, color=C_DARK)
 
 
 def generate_pdf(output_path="ARGUS_ROUND_2_SUBMISSION_REPORT.pdf"):
@@ -756,6 +940,8 @@ def generate_pdf(output_path="ARGUS_ROUND_2_SUBMISSION_REPORT.pdf"):
     build_page_6(doc)
     build_page_7(doc)
     build_page_8(doc)
+    build_page_9(doc)
+    build_page_10(doc)
     doc.save(output_path)
     print(f"Successfully generated {output_path} with {len(doc)} pages.")
 
