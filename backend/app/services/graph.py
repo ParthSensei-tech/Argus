@@ -81,11 +81,15 @@ def traverse_dependents(
             WHERE REPLACE(CAST(e.org_id AS TEXT), '-', '') = REPLACE(CAST(:org AS TEXT), '-', '')
               AND dep.depth < :max_depth
               AND dep.path NOT LIKE '%' || CAST(e.src_id AS TEXT) || '%'
+        ),
+        uniq AS (
+            SELECT id, MIN(depth) AS depth, MIN(path) AS path
+            FROM dep GROUP BY id
         )
-        SELECT DISTINCT dep.id, dep.depth, dep.path,
+        SELECT u.id, u.depth, u.path,
                n.entity_type, n.ref_id, n.label, n.properties
-        FROM dep JOIN graph_nodes n ON n.id = dep.id
-        ORDER BY dep.depth
+        FROM uniq u JOIN graph_nodes n ON n.id = u.id
+        ORDER BY u.depth
     """)
     rows = db.execute(
         sql, {"root": str(root_node_id), "org": str(org_id), "max_depth": max_depth}
