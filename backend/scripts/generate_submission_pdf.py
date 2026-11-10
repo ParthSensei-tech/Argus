@@ -6,7 +6,7 @@ Generates a publication-grade, 10-page PDF document detailing:
   Page 3: Provenance-Aware Knowledge Representation & Change Impact Knowledge Graph
   Page 4: Multimodal Content Intake & Specialist Verification Pipelines (Text, Images, Documents)
   Page 5: Intent-Preserving Corrections, Human Authority Governance Gates & SHA-256 Audit Ledger
-  Page 6: Comprehensive REST API Reference & Endpoint Specifications (All 18+ Endpoints)
+  Page 6: Comprehensive REST API Reference & Endpoint Specifications (Key Endpoints)
   Page 7: AI Models, System Prompts, Inference Architecture, Libraries & Implementation Stack
   Page 8: Tested Scenarios, End-to-End Verification Matrix (14 Passing Stages) & Judge Data Readiness
   Page 9: Technical Decisions, Engineering Tradeoffs, Architectural Rationale & Deviations
@@ -197,14 +197,16 @@ def build_page_1(doc):
     page.draw_line(pymupdf.Point(40, y + 4), pymupdf.Point(PAGE_WIDTH - 40, y + 4), color=C_SECONDARY, width=1.5)
     y += 18
     
-    readiness_box = pymupdf.Rect(40, y, PAGE_WIDTH - 40, y + 85)
+    readiness_box = pymupdf.Rect(40, y, PAGE_WIDTH - 40, y + 112)
     draw_card(page, readiness_box, bg_color=rgb("#EFF6FF"), border_color=C_SECONDARY)
     r_lines = [
         "- Zero Theoretical Simulations: Fully implemented FastAPI backend, Next.js 15 App Router frontend, and SQLite/PostgreSQL schemas.",
         "- Complete 14-Suite Smoke Test Verified: Automated end-to-end verification passing 100% of integration stages in live runtime.",
         "- Multi-User RBAC & Tenant Isolation: Strict multi-tenancy enforcing organization isolation across Admin, Reviewer, and Editor roles.",
         "- Dynamic Judge-Input Ready: Offline deterministic fallbacks ensure immediate evaluation even without active third-party LLM API keys.",
-        "- Production Build Verified: Next.js 15 production build passed with all 13 routes optimized; 1-click instant demo logins active."
+        "- Production Build Verified: Next.js 15 production build passed with all 13 routes optimized; 1-click instant demo logins active.",
+        "- Live Public Deployment: Vercel (frontend) + Render (FastAPI backend) + Supabase PostgreSQL/pgvector; browser-verified end-to-end.",
+        "- Judge Access Link: https://argus-drab-omega.vercel.app  (1-click Admin / Reviewer / Editor demo logins, no setup required)."
     ]
     insert_multiline_text(page, r_lines, 52, y + 16, fontsize=8.3, line_spacing=13, color=C_DARK)
 
@@ -602,17 +604,20 @@ def build_page_6(doc):
         ("POST /auth/demo-login", "One-click login for demo personas (admin, reviewer, editor)", "Public", "200: access_token, user"),
         ("POST /auth/login", "Password authentication with email and password", "Public", "200: JWT Bearer Token"),
         ("GET /auth/me", "Fetch current user profile and organization memberships", "Bearer JWT", "200: UserOut + Orgs"),
-        ("POST /reviews/", "Submit text, image, or doc for 7-agent swarm analysis", "Editor+", "201: ReviewDetail + Telemetry"),
+        ("POST /reviews", "Submit text, image, or doc for 7-agent swarm analysis", "Editor+", "201: ReviewOut + Telemetry"),
+        ("GET /reviews", "List organization reviews with status and risk filters", "Member", "200: List[ReviewOut]"),
         ("GET /reviews/{id}", "Get full review cockpit, agent status, and evidence findings", "Member", "200: ReviewDetail Object"),
-        ("POST /reviews/{id}/decide", "Submit human decision (APPROVE, REJECT, REQUEST_REVISION)", "Reviewer+", "200: ApprovalDecisionOut"),
-        ("GET /knowledge/items", "List approved and pending brand guidelines, facts, terms", "Member", "200: List[KnowledgeItemOut]"),
-        ("POST /knowledge/items", "Create new brand knowledge item (initial state: PENDING)", "Editor+", "201: KnowledgeItemOut"),
+        ("POST /reviews/{id}/decision", "Human decision (APPROVE, REJECT, REQUEST_REVISION)", "Reviewer+", "200: ReviewOut"),
+        ("GET /knowledge/items", "List approved and pending brand guidelines, facts, terms", "Member", "200: List[ItemOut]"),
+        ("POST /knowledge/items", "Create new brand knowledge item (initial state: PENDING)", "Editor+", "201: ItemOut"),
         ("POST /knowledge/items/{id}/approve", "Promote pending knowledge item to active approved index", "Reviewer+", "200: Approved Item"),
-        ("GET /graph/", "Retrieve full Change Impact Knowledge Graph snapshot", "Member", "200: GraphSnapshot (nodes/edges)"),
-        ("GET /impact/events", "List ripple-effect impact events on historical content", "Member", "200: List[ImpactEventOut]"),
-        ("POST /impact/reassess/{id}", "Trigger automatic re-review of affected historical asset", "Reviewer+", "200: ReassessResponse"),
-        ("GET /audit/", "Query cryptographic audit event ledger with pagination", "Member", "200: List[AuditEventOut]"),
-        ("POST /files/upload", "Upload raster image or multi-page business document", "Editor+", "201: FileUploadResponse")
+        ("GET /knowledge-graph", "Retrieve full Change Impact Knowledge Graph snapshot", "Member", "200: GraphSnapshot (nodes/edges)"),
+        ("GET /impact-events", "List ripple-effect impact events on historical content", "Member", "200: List[ImpactEventOut]"),
+        ("POST /impact-events/{id}/reassess", "Trigger automatic re-review of affected historical asset", "Reviewer+", "200: ReassessResponse"),
+        ("GET /audit", "Query cryptographic audit event ledger with pagination", "Member", "200: List[AuditEventOut]"),
+        ("GET /audit/verify", "Recompute and validate the SHA-256 hash chain integrity", "Member", "200: chain verified"),
+        ("GET /dashboard/summary", "Aggregated KPIs, risk distribution and review telemetry", "Member", "200: DashboardSummary"),
+        ("POST /files/upload", "Upload raster image or multi-page business document", "Editor+", "201: FileOut")
     ]
     
     for idx, (path, desc, auth, resp) in enumerate(api_rows):
@@ -637,7 +642,7 @@ def build_page_6(doc):
     draw_card(page, sec_box, bg_color=rgb("#EFF6FF"), border_color=C_SECONDARY)
     sec_lines = [
         "- Multi-Tenant Org Guard: Every authenticated request resolves caller organization via `X-Org-Id` or user membership.",
-        "- In-Memory Sliding-Window Rate Limiting: 120 req/min limit per caller IP/token to protect AI inference infrastructure.",
+        "- In-Memory Sliding-Window Rate Limiting: 60 req/min default (RATE_LIMIT_PER_MINUTE) per caller IP/token to protect AI inference.",
         "- Strict Boundary Verification: Cross-organization data queries return HTTP 403 Forbidden with security audit logging.",
         "- Input Sanitization Shield: Untrusted document extracts are isolated in data blocks to prevent prompt injection."
     ]
@@ -658,8 +663,8 @@ def build_page_7(doc):
     
     p7_intro = [
         "Argus utilizes a hybrid inference architecture combining frontier multimodal LLMs with deterministic rule engines. Where an API key",
-        "is configured, OpenAI-compatible or Google Gemini endpoints power semantic reasoning; offline deterministic fallbacks guarantee 100%",
-        "test and judge availability without network dependencies."
+        "is configured, OpenRouter free-tier models (NVIDIA Nemotron reasoning/fast, Google Gemma vision) power semantic reasoning; offline",
+        "deterministic fallbacks guarantee 100% test and judge availability without network dependencies."
     ]
     y = insert_multiline_text(page, p7_intro, 40, y, fontsize=8.8, line_spacing=12.5)
     
@@ -673,6 +678,11 @@ def build_page_7(doc):
     page.insert_text(pymupdf.Point(48, y + 16), "AI Swarm Prompt & Temperature Specs", fontname="helv", fontsize=9.5, color=C_WHITE)
     
     ai_lines = [
+        "Live Free-Tier Models (OpenRouter):",
+        " - Reasoning: nvidia/nemotron-3-ultra-550b-a55b:free",
+        " - Fast: nvidia/nemotron-3.5-lightning:free",
+        " - Vision: google/gemma-4-26b-a4b-it:free",
+        " - Embeddings: dev hash vectors (zero-cost) in deployment",
         "Inference Configuration by Agent:",
         " - Agent 1 (Intake): OCR + structured JSON output",
         " - Agent 2 (Knowledge): Cosine similarity embeddings",
@@ -765,7 +775,7 @@ def build_page_8(doc):
     y += 18
     
     test_rows = [
-        ("01", "Health & Service Liveness", "GET /api/v1/health -> status: ok, database reachable", "PASSED"),
+        ("01", "Health & Service Liveness", "GET /health -> status: ok, database reachable", "PASSED"),
         ("02", "Multi-Tenant Registration", "Create unique org 'Acme Corp' + admin user", "PASSED"),
         ("03", "JWT Authentication & RBAC", "Issue JWT bearer tokens for Admin, Reviewer, and Editor roles", "PASSED"),
         ("04", "Brand Profile Creation", "Persist color palette hex codes, voice guidelines, tone traits", "PASSED"),
@@ -799,13 +809,14 @@ def build_page_8(doc):
     page.draw_line(pymupdf.Point(40, y + 3), pymupdf.Point(PAGE_WIDTH - 40, y + 3), color=C_SECONDARY, width=1.0)
     y += 14
     
-    judge_box = pymupdf.Rect(40, y, PAGE_WIDTH - 40, y + 75)
+    judge_box = pymupdf.Rect(40, y, PAGE_WIDTH - 40, y + 88)
     draw_card(page, judge_box, bg_color=rgb("#EFF6FF"), border_color=C_SECONDARY)
     j_lines = [
         "Argus is engineered to handle any novel content, brand rule, or document submitted by the evaluation committee:",
         " - Dynamic Vocabulary Extraction: Prohibited term detectors dynamically parse arbitrary terms from structured JSON or title strings.",
         " - Zero-Crash MIME-Type Fallbacks: Extension-based fallback handlers accommodate arbitrary document uploads without 415 errors.",
-        " - Dual-Mode Execution Architecture: Runs seamlessly with live OpenAI-compatible LLM endpoints or deterministic local fallbacks."
+        " - Dual-Mode Execution Architecture: Runs seamlessly with live OpenRouter free-tier LLM endpoints or deterministic local fallbacks.",
+        " - Public Web Verified: live Vercel+Render+Supabase stack browser-tested end-to-end incl. judge-supplied custom content and rules."
     ]
     insert_multiline_text(page, j_lines, 52, y + 16, fontsize=8.2, line_spacing=12, color=C_DARK)
 
@@ -913,19 +924,19 @@ def build_page_10(doc):
     insert_multiline_text(page, feat_lines, 45, y, fontsize=7.5, line_spacing=10.5, color=C_DARK)
     
     y += 94
-    page.insert_text(pymupdf.Point(40, y), "21. FREE CLOUD HOSTING & JUDGE DEMO ACCESS BLUEPRINT", fontname="helv", fontsize=11, color=C_PRIMARY)
+    page.insert_text(pymupdf.Point(40, y), "21. LIVE FREE-TIER DEPLOYMENT & JUDGE DEMO ACCESS", fontname="helv", fontsize=11, color=C_PRIMARY)
     page.draw_line(pymupdf.Point(40, y + 3), pymupdf.Point(PAGE_WIDTH - 40, y + 3), color=C_SECONDARY, width=1.0)
     y += 13
     
     deploy_box = pymupdf.Rect(40, y, PAGE_WIDTH - 40, y + 78)
     draw_card(page, deploy_box, bg_color=rgb("#EFF6FF"), border_color=C_SECONDARY)
     dep_lines = [
-        "How to Host 100% Free & Share Live Links with Judges:",
-        "1. Frontend on Vercel (100% Free): Connect GitHub repo -> root directory 'frontend' -> Deploy with 1-click.",
-        "   Environment Variable: NEXT_PUBLIC_API_URL = https://<your-backend>.onrender.com",
-        "2. Backend on Render or HuggingFace Spaces (100% Free): Connect repo -> root 'backend' -> Python 3.12.",
-        "   Start Command: uvicorn app.main:app --host 0.0.0.0 --port 10000 | Free managed SQLite or Neon PostgreSQL.",
-        "3. Instant Zero-Setup Tunnel (Alternative): Run `cloudflared tunnel --url http://localhost:3000` to generate a live public HTTPS URL!"
+        "LIVE DEPLOYMENT (100% free tier) — judges open the frontend link below:",
+        "1. Frontend (JUDGE LINK): https://argus-drab-omega.vercel.app  (Vercel Hobby, Next.js 15 App Router).",
+        "   1-click demo logins: admin@argus.demo / reviewer@argus.demo / editor@argus.demo  (password: Demo1234!).",
+        "2. Backend API: https://argus-t083.onrender.com  (Render free Docker, FastAPI, inline eager tasks).",
+        "   Database: Supabase managed PostgreSQL + pgvector (free). Storage: ephemeral local on Render.",
+        "3. Keep-warm: cron-job.org GET https://argus-t083.onrender.com/health every 10 min avoids cold starts."
     ]
     insert_multiline_text(page, dep_lines, 50, y + 14, fontsize=7.6, line_spacing=10.5, color=C_DARK)
 
